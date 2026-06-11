@@ -283,21 +283,29 @@ void ConvDiffLLAVJacobFluxReconstruction::execute()
   CellToFaceGEBuilder::GeoData& geoDataCBR = m_cellBuilders[RIGHT]->getDataGE();
   geoDataCBR.trs = cells;
   
-  // reset epsilon in vertices
-  m_nodeEpsilons = 0.0;
-  
+  // in linear residual mode (JFNK matrix-free evaluations, preconditioner
+  // block assembly) the sensor pass is skipped: the artificial viscosity is
+  // frozen at the base-point values stored in m_nodeEpsilons/m_cellEpsilons
+  const bool linearMode = getMethodData().isLinearResidualMode();
+
   // get current residual
   const CFreal residual = SubSystemStatusStack::getActive()->getResidual();
-  
+
   // get current iteration
   const CFuint iter = SubSystemStatusStack::getActive()->getNbIter();
-  
+
+  if (!linearMode)
+  {
+  // reset epsilon in vertices
+  m_nodeEpsilons = 0.0;
+
   // check if LLAV should be frozen
   m_useMax = residual < m_freezeLimiterRes || iter > m_freezeLimiterIter;
-  
+
   // initialize Smax and eps_total
   m_Smax = -100.0;
   m_totalEps = 0.0;
+  }
   
   ////////////////////COMPUTE EPSILON AND GRADIENTS/////////////////////////
   
@@ -372,6 +380,8 @@ void ConvDiffLLAVJacobFluxReconstruction::execute()
 //       // if the states in the cell are parallel updatable, compute the resUpdates (-divFC)
 //       if ((*m_cellStates)[0]->isParUpdatable())
 //       {
+      if (!linearMode)
+      {
 	// compute the states projected on order P-1
 	computeProjStates(m_statesPMinOne);
 
@@ -380,7 +390,8 @@ void ConvDiffLLAVJacobFluxReconstruction::execute()
 
 	// store epsilon
 	storeEpsilon();
-//       } 
+      }
+//       }
 
       // add the cell part to the gradients
       computeGradients();
@@ -391,7 +402,7 @@ void ConvDiffLLAVJacobFluxReconstruction::execute()
   }
 
   //// print outputs of LLAV
-  if (m_printLLAV && iter%m_showrate == 0)
+  if (!linearMode && m_printLLAV && iter%m_showrate == 0)
   {
     const std::string nsp = this->getMethodData().getNamespace();
   
@@ -2044,7 +2055,6 @@ void ConvDiffLLAVJacobFluxReconstruction::computeBothJacobsDiffFaceTerm()
               
             if (m_needToAddSolPnt[pertSolIdx])
             {
-              CFLog(INFO, "dependingKSol:: in the if\n");
               // add part on this side of face
               m_tempFlux = 0.0;
 
@@ -2052,11 +2062,9 @@ void ConvDiffLLAVJacobFluxReconstruction::computeBothJacobsDiffFaceTerm()
               for (CFuint kSolPnt = 0; kSolPnt < m_nbrSolDep; ++kSolPnt)
               {
                 const CFuint kSolIdx = (*m_flxSolDep)[flxPntIdxThis][kSolPnt];
-              CFLog(INFO, "kSolIdx::  "<<kSolIdx<<"\n");
                 for (CFuint lSol = 0; lSol < m_nbrSolSolDep; ++lSol)
                 {
-                  const CFuint lSolIdx = (*m_solSolDep)[pertSolIdx][lSol]; 
-                CFLog(INFO, "lSolIdx::  "<<lSolIdx<<"\n");
+                  const CFuint lSolIdx = (*m_solSolDep)[pertSolIdx][lSol];
                   if (lSolIdx == kSolIdx)
                   {
                     dependingKSol = kSolIdx;
@@ -2067,12 +2075,8 @@ void ConvDiffLLAVJacobFluxReconstruction::computeBothJacobsDiffFaceTerm()
 
 
               const CFreal divh_halfFaceJacob_l = divh_halfFaceJacob * (*m_solPolyValsAtFlxPnts)[flxPntIdxThis][dependingKSol];
-              CFLog(INFO, "divh_halfFaceJacob_l::  "<<divh_halfFaceJacob_l<<"\n");
               /// llav jacob to state part
               //m_tempFlux += m_llavRiemannFluxJacobian[m_pertSide][pertSolIdx][m_pertVar][iFlxPnt] * divh_halfFaceJacob_l;
-                CFLog(INFO, "m_pertSide::  "<<m_pertSide<<"\n");
-                CFLog(INFO, "dependingKSol::  "<<dependingKSol<<"\n");
-                CFLog(INFO, "pertSolIdx::  "<<pertSolIdx<<"\n");
 
               // (b)
               for (CFuint iDim = 0; iDim < m_dim; ++iDim)
