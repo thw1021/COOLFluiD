@@ -1,4 +1,4 @@
-#IF (NOT CF_ENABLE_CUDA) 
+#IF (NOT CF_ENABLE_CUDA)
 SET ( CF_LIBRARY_LINK_FLAGS "" CACHE STRING "Extra link flags for libraries" FORCE )
 #ELSE()
 #SET ( CF_LIBRARY_LINK_FLAGS "-Xcompiler" CACHE STRING "Extra link flags for libraries" FORCE )
@@ -10,7 +10,7 @@ MARK_AS_ADVANCED ( CF_LIBRARY_LINK_FLAGS )
 ########################################################################################
 
 IF(UNIX)
-  
+
   # gnu specific warning flags
   IF( NOT CF_HAVE_CUDA AND CMAKE_COMPILER_IS_GNUCC )
 
@@ -21,17 +21,17 @@ IF(UNIX)
     CF_ADD_C_FLAGS("-ansi")
 
 #IF(CF_ENABLE_MUTATIONPP)
-    # use new features from c++0x
-#    CF_ADD_CXX_FLAGS("-std=c++0x")
+    # use new features from c++17 (required for Boost 1.85+ atomic headers)
+    CF_ADD_CXX_FLAGS("-std=c++17")
 #ELSE()
     # respect c++ 98 standard
-    CF_ADD_CXX_FLAGS("-std=c++98")
+#    CF_ADD_CXX_FLAGS("-std=c++98")
 #ENDIF(CF_ENABLE_MUTATIONPP)
-   
+
     # dont allow gnu extensions
     CF_ADD_CXX_FLAGS("-fno-gnu-keywords")
-    CF_ADD_CXX_FLAGS("-Wno-dev")  
-    
+    CF_ADD_CXX_FLAGS("-Wno-dev")
+
     # dont defined common variables
     CF_ADD_C_FLAGS("-fno-common")
     CF_ADD_CXX_FLAGS("-fno-common")
@@ -39,7 +39,7 @@ IF(UNIX)
     if ( CF_ENABLE_WARNINGS )
       # use many warnings
       CF_ADD_CXX_FLAGS("-Wall")
-     # this is added for checking 
+     # this is added for checking
 #      CF_ADD_CXX_FLAGS("-W")
 #      CF_ADD_CXX_FLAGS("-Wextra")
 #      CF_ADD_CXX_FLAGS("-Woverloaded-virtual")
@@ -122,8 +122,8 @@ IF ( APPLE )
 	IF( CMAKE_COMPILER_IS_GNUCC )
   		SET ( CF_HAVE_CXX_EXPLICIT_TEMPLATES OFF CACHE BOOL "Support for explicit templates deactivated -- Apple with GCC don't support it" )
 	ENDIF()
-	
-	
+
+
 	#  # improve the linker compiler to avoid unresolved symbols causing errors
         #  SET(CMAKE_CXX_CREATE_SHARED_LIBRARY
         #  "<CMAKE_CXX_COMPILER> -undefined dynamic_lookup <LANGUAGE_COMPILE_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <LINK_FLAGS> -o <TARGET> -install_name <TARGET_INSTALLNAME_DIR><TARGET_SONAME> <OBJECTS> <LINK_LIBRARIES>")

@@ -31,7 +31,7 @@ public:
     Common::Exception(where, what, "NoSuchStorageException") {}
 
   /// Copy constructor
-  NoSuchStorageException ( const NoSuchStorageException& e) throw () : Exception(e) {}
+  NoSuchStorageException ( const NoSuchStorageException& e): Exception(e) {}
 
 }; // end of class NoSuchStorageException
 

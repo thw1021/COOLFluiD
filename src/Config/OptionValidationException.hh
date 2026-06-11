@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "OptionValidationException") {}
 
   /// Copy constructor
-  OptionValidationException ( const OptionValidationException& e) throw () : Exception(e) {}
+  OptionValidationException ( const OptionValidationException& e): Exception(e) {}
 
 }; // end of class OptionValidationException
 

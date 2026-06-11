@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "BadValueException") {}
 
   /// Copy constructor
-  BadValueException ( const BadValueException& e) throw () : Exception(e) {}
+  BadValueException ( const BadValueException& e): Exception(e) {}
 
 }; // end of class BadValueException
 

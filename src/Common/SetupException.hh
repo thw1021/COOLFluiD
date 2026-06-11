@@ -29,7 +29,7 @@ public:
     Common::Exception(where, what, "SetupException") {}
 
   /// Copy constructor
-  SetupException ( const SetupException& e) throw () : Exception(e) {}
+  SetupException ( const SetupException& e): Exception(e) {}
 
 }; // end of class SetupException
 

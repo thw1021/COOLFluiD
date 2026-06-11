@@ -231,7 +231,7 @@ namespace logcpp {
         _conversionPattern = "";
     }
 
-    void PatternLayout::setConversionPattern(const std::string& conversionPattern) throw(ConfigureFailure) {
+    void PatternLayout::setConversionPattern(const std::string& conversionPattern)  {
         std::istringstream conversionStream(conversionPattern);
         std::string literal;
 

@@ -29,7 +29,7 @@ public:
   ParserException ( const Common::CodeLocation& where, const std::string& what);
 
   /// Copy constructor
-  ParserException ( const ParserException& e) throw ();
+  ParserException ( const ParserException& e);
 
 }; // end of class ParserException
 

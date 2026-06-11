@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "ConfigOptionException") {}
 
   /// Copy constructor
-  ConfigOptionException ( const ConfigOptionException& e) throw () : Exception(e) {}
+  ConfigOptionException ( const ConfigOptionException& e): Exception(e) {}
 
 }; // end of class ConfigOptionException
 

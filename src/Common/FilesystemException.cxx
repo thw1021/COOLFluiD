@@ -21,7 +21,7 @@ FilesystemException::FilesystemException ( const Common::CodeLocation& where, co
 
 //////////////////////////////////////////////////////////////////////////////
 
-FilesystemException::FilesystemException ( const FilesystemException& e) throw ()
+FilesystemException::FilesystemException ( const FilesystemException& e)
 : Exception(e) 
 {}
 

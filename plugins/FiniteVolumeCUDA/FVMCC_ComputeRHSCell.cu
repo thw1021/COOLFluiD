@@ -579,9 +579,9 @@ void FVMCC_ComputeRHSCell<SCHEME,PHYSICS,POLYREC,LIMITER,NB_BLOCK_THREADS>::exec
   DataHandle<CFreal> normals = socket_normals.getDataHandle();
   DataHandle<CFint> isOutward = socket_isOutward.getDataHandle();  
   
-  SafePtr<SCHEME> lf  = getMethodData().getFluxSplitter().d_castTo<SCHEME>();
-  SafePtr<POLYREC> pr = getMethodData().getPolyReconstructor().d_castTo<POLYREC>();
-  SafePtr<LIMITER> lm = getMethodData().getLimiter().d_castTo<LIMITER>();
+  SafePtr<SCHEME> lf  = getMethodData().getFluxSplitter().template d_castTo<SCHEME>();
+  SafePtr<POLYREC> pr = getMethodData().getPolyReconstructor().template d_castTo<POLYREC>();
+  SafePtr<LIMITER> lm = getMethodData().getLimiter().template d_castTo<LIMITER>();
   SafePtr<typename PHYSICS::PTERM> phys = PhysicalModelStack::getActive()->getImplementor()->
     getConvectiveTerm().d_castTo<typename PHYSICS::PTERM>();
   

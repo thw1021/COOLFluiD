@@ -207,7 +207,7 @@ public:
     
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
-  SVDException(const SVDException& e) throw() : Common::Exception(e) {}
+  SVDException(const SVDException& e)  : Common::Exception(e) {}
 };
 
 //////////////////////////////////////////////////////////////////////////////

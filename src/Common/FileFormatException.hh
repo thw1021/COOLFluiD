@@ -38,7 +38,7 @@ public:
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
   FileFormatException(const FileFormatException& e)
-    throw() : Common::Exception(e)
+     : Common::Exception(e)
   {
   }
 

@@ -109,18 +109,18 @@ public: // methods
 
   /// Gets the InterpolatorProperties given a certain InterpolatorID present in the register.
   InterpolatorProperties
-  getInterpolatorProperties(const InterpolatorID& id) const throw (Common::NoSuchValueException);
+  getInterpolatorProperties(const InterpolatorID& id) const;
 
   /// Consults the register to get the InterpolatorID of a certain interpolator
   /// given its name.
-  InterpolatorID getInterpolatorID(const std::string& name) const throw (Common::NoSuchValueException);
+  InterpolatorID getInterpolatorID(const std::string& name) const;
 
   /// Consults the register to get the InterpolatorID of a certain interpolator
   /// given its properties.
   InterpolatorID getInterpolatorID(
                            const CFPolyForm::Type&  interpolType,
                            const CFPolyOrder::Type& interpolOrder,
-                           const CFGeoShape::Type&  shape) const throw (Common::NoSuchValueException);
+                           const CFGeoShape::Type&  shape) const;
 
   /// Regists an Interpolator to be used in the SubSystem.
   InterpolatorID registInterpolator(const std::string&    name,

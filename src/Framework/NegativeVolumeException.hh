@@ -31,7 +31,7 @@ public:
     Common::Exception(where, what, "NegativeVolumeException") {}
 
   /// Copy constructor
-  NegativeVolumeException ( const NegativeVolumeException& e) throw () : Exception(e) {}
+  NegativeVolumeException ( const NegativeVolumeException& e): Exception(e) {}
 
 }; // end of class NegativeVolumeException
 

@@ -24,7 +24,7 @@ public:
     Common::Exception(where, what, "MPIException") {}
 
   /// Copy constructor
-  MPIException(const MPIException& e) throw  () : Exception(e) {}
+  MPIException(const MPIException& e): Exception(e) {}
 
 }; // class MPIException
 

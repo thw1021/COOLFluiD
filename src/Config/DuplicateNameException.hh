@@ -31,7 +31,7 @@ public:
     Common::Exception(where, what, "DuplicateNameException") {}
 
   /// Copy constructor
-  DuplicateNameException ( const DuplicateNameException& e) throw () : Exception(e) {}
+  DuplicateNameException ( const DuplicateNameException& e): Exception(e) {}
 
 }; // end of class UnknownStringException
 

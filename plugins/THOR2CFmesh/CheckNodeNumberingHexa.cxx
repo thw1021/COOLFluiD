@@ -46,7 +46,6 @@ CheckNodeNumberingHexa::~CheckNodeNumberingHexa()
 
 void CheckNodeNumberingHexa::
 checkElementNodalNumberingImpl()
-  throw (Framework::NegativeVolumeException)
 {
   CFAUTOTRACE;
   const CFuint nbElem = _elementNode->nbRows();

@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "FailedCastException") {}
 
   /// Copy constructor
-  FailedCastException ( const FailedCastException& e) throw () : Exception(e) {}
+  FailedCastException ( const FailedCastException& e): Exception(e) {}
 
 }; // end of class FailedCastException
 

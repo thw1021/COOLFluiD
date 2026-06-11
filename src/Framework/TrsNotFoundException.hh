@@ -35,7 +35,7 @@ public:
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
   TrsNotFoundException(const TrsNotFoundException& e)
-    throw() : Exception(e)
+     : Exception(e)
   {
   }
 

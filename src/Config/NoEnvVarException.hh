@@ -31,7 +31,7 @@ public:
     Common::Exception(where, what, "NoEnvVarException") {}
 
   /// Copy constructor
-  NoEnvVarException ( const NoEnvVarException& e) throw () : Exception(e) {}
+  NoEnvVarException ( const NoEnvVarException& e): Exception(e) {}
 
 }; // end of class NoEnvVarException
 

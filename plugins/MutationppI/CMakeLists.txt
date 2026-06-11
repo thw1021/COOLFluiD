@@ -13,6 +13,7 @@ LIST ( APPEND MutationppI_files
 ENDIF()
 
    LIST ( APPEND MutationppI_includedirs ${MUTATIONPP_INCLUDE_DIR} )
+   LIST ( APPEND MutationppI_includedirs ${EIGEN3_INCLUDE_DIR} )
    LIST ( APPEND MutationppI_libs ${MUTATIONPP_LIBRARY} )
    LIST ( APPEND MutationppI_cflibs Framework )
 

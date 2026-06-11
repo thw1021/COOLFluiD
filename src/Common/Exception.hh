@@ -26,7 +26,7 @@ public:
 
   /// Constructor
   ExceptionManager();
-  
+
   /// Gets the instance of the manager
   static ExceptionManager& getInstance ();
 
@@ -34,7 +34,7 @@ public:
   bool ExceptionOutputs;
   /// if exception contructor should dump backtrace
   bool ExceptionDumps;
-  /// if exception contructor should abort execution immedietly 
+  /// if exception contructor should abort execution immedietly
   bool ExceptionAborts;
 
 }; // class ExceptionManager
@@ -70,24 +70,24 @@ class Common_API Exception : public std::exception {
 public: // functions
 
   /// Default copy constructor
-  virtual ~Exception () throw ();
+  virtual ~Exception ();
 
   /// Returns a verbose message with all information about this exception
-  std::string full_description () const throw ();
+  std::string full_description () const;
 
   /// Gets the what description string which does not contain EOL's.
-  const std::string& str () const throw ();
+  const std::string& str () const;
 
   /// @return str().c_str();
-  const char* what () const throw ();
+  const char* what () const noexcept;
 
   /// Append the message to the what() description
   /// @param msg the std::string to be appended
-  void append (const std::string& add) throw ();
+  void append (const std::string& add);
 
   /// @returns the Exception name
   /// Pure virtual so must implement this function in each subclass.
-  virtual std::string getClassName () throw () { return m_class_name; }
+  virtual std::string getClassName () { return m_class_name; }
 
 protected: // functions
 
@@ -95,7 +95,7 @@ protected: // functions
   /// @param msg  A message describing the circumstances of this exception occurence which might be the empty string.
   /// @pre   msg should not contain EOL's
   /// @post  new.what() == what;
-  Exception (CodeLocation where, std::string msg, std::string className) throw ();
+  Exception (CodeLocation where, std::string msg, std::string className);
 
 protected: // data
 

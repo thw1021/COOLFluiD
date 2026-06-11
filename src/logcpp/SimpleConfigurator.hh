@@ -40,7 +40,7 @@ namespace logcpp {
          * @exception ConfigureFailure if the method encountered a read or 
          * syntax error.
          **/
-        static void configure(const std::string& initFileName) throw (ConfigureFailure);
+        static void configure(const std::string& initFileName);
 
         /**
          * Configure logcpp with the configuration in the given file.
@@ -51,7 +51,7 @@ namespace logcpp {
          * @exception ConfigureFailure if the method encountered a read or 
          * syntax error.
          **/
-        static void configure(std::istream& initFile) throw (ConfigureFailure);    };
+        static void configure(std::istream& initFile);    };
 }
 
 #endif

@@ -36,8 +36,8 @@ namespace logcpp {
 
 #else  // LOGCPP_FIX_ERROR_COLLISION
 #error Naming collision for 'ERROR' detected. Please read the FAQ for a \
-       workaround. 
-#endif // LOGCPP_FIX_ERROR_COLLISION 
+       workaround.
+#endif // LOGCPP_FIX_ERROR_COLLISION
 
 #endif // ERROR
 
@@ -53,12 +53,10 @@ namespace logcpp {
 
 #else  // LOGCPP_FIX_ERROR_COLLISION
 #error Naming collision for 'DEBUG' detected. Please read the FAQ for a \
-       workaround. 
-#endif // LOGCPP_FIX_ERROR_COLLISION 
+       workaround.
+#endif // LOGCPP_FIX_ERROR_COLLISION
 
 #endif // DEBUG
-
-
 namespace logcpp {
 
     /**
@@ -72,11 +70,11 @@ namespace logcpp {
          * Predefined Levels of Priorities. These correspond to the
          * priority levels used by syslog(3).
          **/
-        typedef enum {EMERG  = 0, 
+        typedef enum {EMERG  = 0,
 		      FATAL  = 0,
                       ALERT  = 100,
                       CRIT   = 200,
-                      ERROR  = 300, 
+                      ERROR  = 300,
                       WARN   = 400,
                       NOTICE = 500,
                       INFO   = 600,
@@ -92,24 +90,23 @@ namespace logcpp {
         /**
          * Returns the name of the given priority value.
          * Currently, if the value is not one of the PriorityLevel values,
-         * the method returns the name of the largest priority smaller 
+         * the method returns the name of the largest priority smaller
          * the given value.
          * @param priority the numeric value of the priority.
          * @returns a string representing the name of the priority.
          **/
-        static const std::string& getPriorityName(int priority) throw();
-	
+        static const std::string& getPriorityName(int priority) ;
+
 	/**
-	 * Returns the value of the given priority name. 
-	 * This can be either one of EMERG ... NOTSET or a 
+	 * Returns the value of the given priority name.
+	 * This can be either one of EMERG ... NOTSET or a
 	 * decimal string representation of the value, e.g. '700' for DEBUG.
 	 * @param priorityName the string containing the the of the priority
 	 * @return the value corresponding with the priority name
-	 * @throw std::invalid_argument if the priorityName does not 
+	 * @throw std::invalid_argument if the priorityName does not
 	 * correspond with a known Priority name or a number
 	 **/
-        static Value getPriorityValue(const std::string& priorityName)
-	throw(std::invalid_argument);
+        static Value getPriorityValue(const std::string& priorityName);
     };
 }
 

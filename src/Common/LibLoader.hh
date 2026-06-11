@@ -28,7 +28,7 @@ public:
     Common::Exception(where, what, "LibLoaderException") {}
 
   /// Copy constructor
-  LibLoaderException ( const LibLoaderException& e) throw () : Exception(e) {}
+  LibLoaderException ( const LibLoaderException& e): Exception(e) {}
 
 }; // end class LibLoaderException
 

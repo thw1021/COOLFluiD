@@ -16,7 +16,7 @@ namespace COOLFluiD {
 ParserException::ParserException ( const Common::CodeLocation& where, const std::string& what) 
 : Common::Exception(where, what, "ParserException") {}
 
-ParserException::ParserException ( const ParserException& e) throw () 
+ParserException::ParserException ( const ParserException& e) 
 : Exception(e) 
 {}
 

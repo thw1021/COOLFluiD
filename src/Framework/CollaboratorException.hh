@@ -36,7 +36,7 @@ public:
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
   CollaboratorException(const CollaboratorException& e)
-    throw() : Exception(e)
+     : Exception(e)
   {
   }
 

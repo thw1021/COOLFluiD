@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "ConsistencyException") {}
 
   /// Copy constructor
-  ConsistencyException ( const ConsistencyException& e) throw () : Exception(e) {}
+  ConsistencyException ( const ConsistencyException& e): Exception(e) {}
 
 }; // end of class ConsistencyException
 

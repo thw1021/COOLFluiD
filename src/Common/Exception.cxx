@@ -33,7 +33,7 @@ ExceptionManager& ExceptionManager::getInstance()
 
 //////////////////////////////////////////////////////////////////////////////
 
-Exception::Exception(CodeLocation where, std::string msg, std::string className) throw ()
+Exception::Exception(CodeLocation where, std::string msg, std::string className)
   : m_where(where), m_msg(msg), m_class_name(className)
 {
   m_what = full_description();
@@ -62,34 +62,34 @@ Exception::Exception(CodeLocation where, std::string msg, std::string className)
 
 //////////////////////////////////////////////////////////////////////////////
 
-Exception::~Exception() throw ()
+Exception::~Exception()
 {
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-void Exception::append(const std::string& add) throw ()
+void Exception::append(const std::string& add)
 {
   m_what += add;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-const std::string& Exception::str () const throw ()
+const std::string& Exception::str () const
 {
   return m_what;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-const char* Exception::what() const throw()
+const char* Exception::what() const noexcept
 {
   return str().c_str();
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-std::string Exception::full_description () const throw ()
+std::string Exception::full_description () const
 {
   std::string desc;
   desc += "+++ Exception thrown ++++++++++++++++\n";

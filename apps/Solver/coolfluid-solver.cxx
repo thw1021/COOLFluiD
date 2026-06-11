@@ -153,6 +153,8 @@ class AppOptions : public Config::ConfigObject {
 int main(int argc, char** argv)
 {
   using namespace boost;
+  namespace fs = boost::filesystem;
+
   
 #ifdef CF_HAVE_SINGLE_EXEC
   auto_ptr<FactoryRegistry> fr(new FactoryRegistry());
@@ -173,7 +175,7 @@ int main(int argc, char** argv)
     options.getOptionList().processCommandLine(argc, argv);
     options.check_options ();
 
-    if ( filesystem::exists( options.conf_file ) )
+    if ( fs::exists( options.conf_file ) )
       options.setConfigFile( options.conf_file );
 
     options.configure ( options.solver_conf );
@@ -202,7 +204,7 @@ int main(int argc, char** argv)
     CFLog(VERBOSE, "--- coolfluid-solver ----------------------------------------\n\n");
  
     // print out starting directory
-    CFLog(VERBOSE, "starting in directory [" << filesystem::current_path().string() << "]\n\n");
+    CFLog(VERBOSE, "starting in directory [" << fs::current_path().string() << "]\n\n");
     
     // print out input parameters 
     CFLog(VERBOSE, "called with arguments:\n");
@@ -228,7 +230,7 @@ int main(int argc, char** argv)
     {
       CFLog(VERBOSE, "Removing previous config logs\n");
       
-      filesystem::directory_iterator ditr(filesystem::current_path()), dir_end;
+      fs::directory_iterator ditr(fs::current_path()), dir_end;
       for( ; ditr != dir_end; ++ditr )
       {
 
@@ -241,10 +243,10 @@ int main(int argc, char** argv)
 	bool is_config = StringOps::startsWith(filename, "config") && StringOps::endsWith(filename, ".log"); 
 	bool is_output = StringOps::endsWith(filename, "-output.log"); 
 	
-	if ( !is_directory( *ditr ) && ( is_config || is_output ) )
+	if ( !fs::is_directory( *ditr ) && ( is_config || is_output ) )
 	{
 	  CFLog(VERBOSE, "removing file: " << filename << "\n");
-	  try { filesystem::remove(*ditr); } catch (...) {};
+	  try { fs::remove(*ditr); } catch (...) {};
 	}
       }
     }
@@ -257,11 +259,11 @@ int main(int argc, char** argv)
     DirPaths::getInstance().addModuleDirs(options.libDir);
     
     // configure the environment
-    filesystem::path casefile;
+    fs::path casefile;
     if ( !Common::StringOps::startsWith( options.scase_file,".") && !Common::StringOps::startsWith(options.scase_file,"/") )
-      casefile  = Environment::DirPaths::getInstance().getBaseDir() / filesystem::path(options.scase_file);
+      casefile  = Environment::DirPaths::getInstance().getBaseDir() / fs::path(options.scase_file);
     else
-      casefile  =  filesystem::path(options.scase_file);
+      casefile  =  fs::path(options.scase_file);
     
     // parse configuration options for environment
     ConfigFileReader cfile_reader;

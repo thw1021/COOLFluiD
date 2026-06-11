@@ -34,7 +34,7 @@ public:
     Common::Exception(where, what, "OSystemException") {}
 
   /// Copy constructor
-  OSystemException ( const OSystemException& e) throw () : Exception(e) {}
+  OSystemException ( const OSystemException& e): Exception(e) {}
 
 }; // end class OSystemException
 

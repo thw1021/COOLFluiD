@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "FailedAssertionException") {}
 
   /// Copy constructor
-  FailedAssertionException(const FailedAssertionException& e) throw  () : Exception(e) {}
+  FailedAssertionException(const FailedAssertionException& e): Exception(e) {}
 
 }; // end of class FailedAssertionException
 

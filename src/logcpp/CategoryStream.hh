@@ -62,7 +62,7 @@ namespace logcpp {
          * Returns the priority for this stream.
          * @returns The priority.
          **/
-        inline Priority::Value getPriority() const throw() {
+        inline Priority::Value getPriority() const  {
             return _priority;
         };
 

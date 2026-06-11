@@ -85,8 +85,7 @@ namespace logcpp {
          * @param conversionPattern the conversion pattern
          * @exception ConfigureFailure if the pattern is invalid
          **/
-        virtual void setConversionPattern(const std::string& conversionPattern)
-            throw(ConfigureFailure);
+        virtual void setConversionPattern(const std::string& conversionPattern);
 
         virtual std::string getConversionPattern() const;
 

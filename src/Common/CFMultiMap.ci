@@ -78,7 +78,7 @@ CFMultiMap<KEY, VALUE>::find(const KEY& aKey, bool& isFound)
 
 template<class KEY, class VALUE>
 inline void CFMultiMap<KEY, VALUE>::valueNotFound(const KEY& aKey)
-  throw (Common::NoSuchValueException)
+  
 {
    std::string msg = "CFMultiMap: KEY not found: ";
    msg += Common::StringOps::to_str(aKey);

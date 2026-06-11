@@ -32,7 +32,7 @@ public:
 
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
-  BadFormatException(const BadFormatException& e) throw() : Exception(e) {}
+  BadFormatException(const BadFormatException& e)  : Exception(e) {}
 
 }; // end of class BadFormatException
 

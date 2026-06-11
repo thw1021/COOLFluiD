@@ -44,8 +44,7 @@ public:
    * Checks the numbering of the nodes and makes it stick
    * to the COOLFluiD convention.
    */
-  void checkElementNodalNumberingImpl()
-    throw (Framework::NegativeVolumeException);
+  void checkElementNodalNumberingImpl();
 
 private: // data
 

@@ -32,7 +32,7 @@ public:
 
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
-  NotImplementedException(const NotImplementedException& e) throw() : Exception(e) {}
+  NotImplementedException(const NotImplementedException& e)  : Exception(e) {}
 
 }; // end of class NotImplementedException
 

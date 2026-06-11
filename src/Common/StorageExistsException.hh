@@ -33,7 +33,7 @@ public:
     Common::Exception(where, what, "StorageExistsException") {}
 
   /// Copy constructor
-  StorageExistsException ( const StorageExistsException& e) throw () : Exception(e) {}
+  StorageExistsException ( const StorageExistsException& e): Exception(e) {}
 
 }; // end of class StorageExistsException
 

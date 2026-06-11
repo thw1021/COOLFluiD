@@ -321,7 +321,7 @@ public:
 				}
 			}
 		}
-		throw("Too many iterations in brent");
+		;
 	}
 };
 
@@ -446,7 +446,7 @@ public:
 				}
 			}
 		}
-		throw("Too many iterations in routine dbrent");
+		;
 	}
 };
 

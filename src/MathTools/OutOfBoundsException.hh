@@ -44,7 +44,7 @@ public:
   /**
    * Default destructor
    */
-  ~OutOfBoundsException() throw()
+  ~OutOfBoundsException() 
   {
   }
 
@@ -52,7 +52,7 @@ public:
    * The Exception name
    * Implement this function in each subclass.
    */
-  virtual std::string getClassName() throw()
+  virtual std::string getClassName() 
   {
     return "OutOfBoundsException";
   }

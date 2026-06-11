@@ -36,7 +36,7 @@ public:
 
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
-  CallWithNoEffectException(const CallWithNoEffectException& e) throw() :
+  CallWithNoEffectException(const CallWithNoEffectException& e)  :
     Exception(e)
   {
   }

@@ -32,7 +32,7 @@ public:
     Exception(where, what, "URLException") {}
 
   /// Copy constructor
-  URLException(const URLException& e) throw () : Exception(e) {}
+  URLException(const URLException& e): Exception(e) {}
 
 }; // end of class URLException
 

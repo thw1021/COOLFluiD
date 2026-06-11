@@ -50,8 +50,6 @@ namespace logcpp {
          **/
         LoggingEvent(const std::string& category, const std::string& message, 
                      const std::string& ndc, Priority::Value priority);
-
-
         /** The category name. */
         const std::string categoryName;
 

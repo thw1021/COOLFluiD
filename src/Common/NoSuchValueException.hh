@@ -32,7 +32,7 @@ public:
   NoSuchValueException ( const Common::CodeLocation& where, const std::string& what);
 
   /// Copy constructor
-  NoSuchValueException ( const NoSuchValueException& e) throw ();
+  NoSuchValueException ( const NoSuchValueException& e);
 
 }; // end of class NoSuchValueException
 

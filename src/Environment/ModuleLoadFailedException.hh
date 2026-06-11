@@ -31,7 +31,7 @@ public:
     Common::Exception(where, what, "ModuleLoadFailedException") {}
 
   /// Copy constructor
-  ModuleLoadFailedException ( const ModuleLoadFailedException& e) throw () : Exception(e) {}
+  ModuleLoadFailedException ( const ModuleLoadFailedException& e): Exception(e) {}
 
 }; // end of class ModuleLoadFailedException
 

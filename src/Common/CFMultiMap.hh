@@ -102,7 +102,7 @@ public:
 
   /// Get the number of pairs already inserted
   CFuint size() const {return _vectorMap.size();}
-  
+
   /// Sort all the pairs in the map by key
   /// @pre before using find() the CFMultiMap has to be sorted
   void sortKeys();
@@ -136,7 +136,7 @@ public:
 private: // helper functions
 
   /// Error reporting in case of the key not being present
-  void valueNotFound(const KEY& aKey) throw(Common::NoSuchValueException);
+  void valueNotFound(const KEY& aKey);
 
 private: //nested classes
 
@@ -174,19 +174,19 @@ private: //nested classes
   /// @author Andrea Lani
   class Compare {
   public:
-    
+
     /// Overloading of the operator() that makes this class acting as a functor
     /// @param p1   pair whose key is used as first term of comparison
     /// @param p2   pair whose key is used as second term of comparison
     /// @return true  if(p1.first > p2.first)
-    /// @post this is the second test to see if p1.first is == key during the 
+    /// @post this is the second test to see if p1.first is == key during the
     /// search with find()
-    bool operator() (const std::pair<KEY,VALUE>& p1, 
+    bool operator() (const std::pair<KEY,VALUE>& p1,
 		     const std::pair<KEY,VALUE>& p2) const
     {
       return (p1.first < p2.first);
     }
-    
+
   };
 
 private: //data

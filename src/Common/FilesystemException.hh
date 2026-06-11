@@ -33,7 +33,7 @@ public:
   FilesystemException ( const Common::CodeLocation& where, const std::string& what);
 
   /// Copy constructor
-  FilesystemException ( const FilesystemException& e) throw ();
+  FilesystemException ( const FilesystemException& e);
 
 }; // end of class FilesystemException
 

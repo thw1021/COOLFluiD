@@ -21,7 +21,6 @@ namespace COOLFluiD {
 //////////////////////////////////////////////////////////////////////////////
 
 InterpolatorProperties InterpolatorRegister::getInterpolatorProperties(const InterpolatorID& id) const
-  throw (Common::NoSuchValueException)
 {
   if(id >= _database.size()) {
     throw Common::NoSuchValueException (FromHere(),"No such InterpolatorID present.");
@@ -35,7 +34,6 @@ InterpolatorProperties InterpolatorRegister::getInterpolatorProperties(const Int
 //////////////////////////////////////////////////////////////////////////////
 
 InterpolatorID InterpolatorRegister::getInterpolatorID(const std::string& name) const
-  throw (Common::NoSuchValueException)
 {
   database_type::const_iterator begin = _database.begin();
   database_type::const_iterator end   = _database.end();
@@ -56,7 +54,6 @@ InterpolatorID InterpolatorRegister::getInterpolatorID(
                                  const CFPolyForm::Type&  interpolType,
                                  const CFPolyOrder::Type& interpolOrder,
                                  const CFGeoShape::Type&  shape) const
-                                 throw (Common::NoSuchValueException)
 {
   database_type::const_iterator begin = _database.begin();
   database_type::const_iterator end   = _database.end();

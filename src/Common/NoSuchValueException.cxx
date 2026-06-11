@@ -17,7 +17,7 @@ NoSuchValueException::NoSuchValueException ( const Common::CodeLocation& where, 
  : Common::Exception(where, what, "NoSuchValueException") 
 {}
 
-NoSuchValueException::NoSuchValueException ( const NoSuchValueException& e) throw ()
+NoSuchValueException::NoSuchValueException ( const NoSuchValueException& e)
  : Exception(e) 
  {}
 

@@ -30,7 +30,7 @@ public:
     Common::Exception(where, what, "FloatingPointException") {}
 
   /// Copy constructor
-  FloatingPointException ( const FloatingPointException& e) throw () : Exception(e) {}
+  FloatingPointException ( const FloatingPointException& e): Exception(e) {}
 
 }; // end of class FloatingPointException
 

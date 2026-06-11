@@ -68,7 +68,7 @@ namespace logcpp {
          * Returns the assigned Priority, if any, for this Category.
          * @return Priority - the assigned Priority, can be Priority::NOTSET
          **/
-        virtual Priority::Value getPriority() const throw();
+        virtual Priority::Value getPriority() const ;
 
         /**
          * Starting from this Category, search the category hierarchy for a
@@ -78,12 +78,12 @@ namespace logcpp {
          * <p>The Category class is designed so that this method executes as
          * quickly as possible.
          **/
-        virtual Priority::Value getChainedPriority() const throw();
+        virtual Priority::Value getChainedPriority() const ;
         
         /**
          * For the moment this method does nothing.
          **/
-        virtual void addAppender(Appender* appender) throw();
+        virtual void addAppender(Appender* appender) ;
 
         /**
          * For the moment this method does nothing.
@@ -122,13 +122,13 @@ namespace logcpp {
          * FixedContextAppenders cannot own Appenders.
          * @returns false
          **/
-        virtual bool ownsAppender() const throw();
+        virtual bool ownsAppender() const ;
 
         /**
          * FixedContextAppenders cannot own Appenders.
          * @returns false
          **/
-        virtual bool ownsAppender(Appender* appender) const throw();
+        virtual bool ownsAppender(Appender* appender) const ;
 
         /**
          * Call the appenders in the hierarchy starting at
@@ -141,7 +141,7 @@ namespace logcpp {
          * 
          * @param event The LoggingEvent to log.
          **/
-        virtual void callAppenders(const LoggingEvent& event) throw();
+        virtual void callAppenders(const LoggingEvent& event) ;
         
         /**
          * Set the additivity flag for this Category instance.
@@ -151,7 +151,7 @@ namespace logcpp {
         /**
          * Returns the additivity flag for this Category instance.
          **/        
-        virtual bool getAdditivity() const throw();
+        virtual bool getAdditivity() const ;
 
        protected:
 
@@ -161,7 +161,7 @@ namespace logcpp {
          * @param message string to write in the log file
          **/  
         virtual void _logUnconditionally2(Priority::Value priority, 
-                                          const std::string& message) throw();
+                                          const std::string& message) ;
 
         private:
 

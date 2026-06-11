@@ -27,28 +27,26 @@
 #include "Properties.hh"
 
 namespace logcpp {
-    
+
     class PropertyConfiguratorImpl {
         public:
         typedef std::map<std::string, Appender*> AppenderMap;
 
         PropertyConfiguratorImpl();
         virtual ~PropertyConfiguratorImpl();
-        virtual void doConfigure(const std::string& initFileName)
-            throw (ConfigureFailure);
-        virtual void doConfigure(std::istream& in)
-            throw (ConfigureFailure);
+        virtual void doConfigure(const std::string& initFileName);
+        virtual void doConfigure(std::istream& in);
 
         protected:
         /**
            configure the given category. This includes setting its Priority
-           and adding any Appenders. 
+           and adding any Appenders.
            @todo setting other properties like 'additivity'.
-           @param categoryname	Name of the category to configure. 
+           @param categoryname	Name of the category to configure.
            The name 'rootCategory' refers to the root Category.
            throw ConfigureFailure
          **/
-        void configureCategory(const std::string& categoryname) throw (ConfigureFailure);
+        void configureCategory(const std::string& categoryname);
 
         /**
          * Get a list of categories for which we should do the configuration.  This simply
@@ -57,15 +55,15 @@ namespace logcpp {
          */
         void getCategories(std::vector<std::string>& categories) const;
 
-        void instantiateAllAppenders() throw(ConfigureFailure);
+        void instantiateAllAppenders();
 
         /**
          * Intantiate and configure the appender referred to by the given name. This method searches the
          * map to find all configuration parameters for the appender, and adds the appender
          * to the given category.  This isn't very general in the sense that it will need to
-         * be modified for each type of appender and layout.  A more general solution would 
-         * be to define an "options" interface for each appender and layout, so that we can 
-         * simply call this method with a list of options instead of needing to know what is 
+         * be modified for each type of appender and layout.  A more general solution would
+         * be to define an "options" interface for each appender and layout, so that we can
+         * simply call this method with a list of options instead of needing to know what is
          * or is not available.  This would also require some generic way of instantiating an
          * object for which we have no knowledge.  An "AppenderFactory" could be used which
          * maps the given type to an actual object class registered with the factory (?? is this
