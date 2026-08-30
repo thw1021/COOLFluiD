@@ -1,3 +1,10 @@
 build/
 install/
 plugins/NEQ/testcases/TCNEQ/Hornung/coarse.CFmesh
+--help_iter_0.plt
+burgersFVM.CFmesh
+burgersFVM.plt
+convergence.plt.Default
+P0-output.log
+plugins/Burgers/testcases/burgers.CFmesh
+.codebuddy/
