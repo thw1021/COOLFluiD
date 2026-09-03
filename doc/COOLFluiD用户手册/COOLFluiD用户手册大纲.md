@@ -43,7 +43,7 @@
 - 1.3.1 物理覆盖：可压缩 Euler/NS/RANS（SA、k-ω、GReKO γ-Reθ 转换、γ-θ GammaAlpha）、热化学非平衡（2T/多温度）、LTE、MHD（理想/电阻/多流体/熵稳定）、Maxwell、ICP 电感耦合等离子体、ArcJet 弧加热、ATD 电弧热等离子体、辐射传输、传热/结构耦合、燃烧（FiniteVolumeCombustion）、拉格朗日粒子（LagrangianSolver）
 - 1.3.2 数值覆盖：有限体积（单元中心 FVMCC）、残差分布法（RDS/FluctSplit，天然节点中心）、间断伽辽金（DG）、通量重构（FR/CPR）、谱差分（SD/SpectralFD）、谱体积（SV/SpectralFV）、有限元（FE）
 - 1.3.3 计算能力：MPI 并行（含混合 MPI/CUDA）、CUDA GPU 加速（ViennaCL）、并行 I/O、隐式/显式时间推进、网格自适应与动网格、子系统耦合（串行/并发）、动态负载平衡（ParMetis）
-- 1.3.4 规模数据（经实测）：`src/` 内核 1186 文件，`plugins/` 9746 文件（3301 `.hh`、2930 `.cxx`、1019 `.CFcase`、751 `.xz` 数据包），仓库总计约 2.2 万文件
+- 1.3.4 规模数据（经实测，2026-09 复核更新）：`src/` 内核 1186 文件，`plugins/` **9747** 文件（3301 `.hh`、2930 `.cxx`、1019 `.CFcase`、751 `.xz` 数据包；旧记 9746，见附 C.10 第 109 条），仓库总计约 2.2 万文件
 
 ### 1.4 适用领域
 - 1.4.1 高超声速与高焓流动：钝体绕流、激波-激波/激波-边界层干扰、热流预测（`DoubleEllipse`、`F15`、`BluntBody2D`、`DoubleCone` 等算例群）
@@ -836,3 +836,30 @@
 - 第 12 章：异常格式（`Exception.cxx:43-53`）、`Unused User Configuration Arguments` + `ConfigOptionException`（`Simulator.cxx:288-293`）、`CFEnv` 键默认值、`CFWarnOrphanFiles`/`OrphanFiles.txt`（`DefineMacros.cmake:35`、`CMakeLists.txt:626`）——全部一致。
 - 第 2 章 2.4.3：`FluxSplitter=Centred`/`PolyRec=Constant`/`builderName=FVMCC`/`CFL.Value=0.3`/`listTRS=InnerFaces NoSlipWall SuperInlet SuperOutlet`；2.4.4 `NoSlipWallIsothermalNSPvtFVMCC` 注册于 `plugins/FiniteVolumeNavierStokes/NoSlipWallIsothermalNSPvt.cxx`——全部一致。
 - 第 8 章：`cmake/Find*.cmake` 恰 **13 个**（清单与手册一致）、8.2.1 全部 12 个 `CF_ENABLE_*` 默认 ON（`DefineGlobalOptions.cmake`）、8.8 命令行默认 `log=600`（`Priority.hh:80`）/`residual=1.79769e+308`/`tolerance=3`/`conf=coolfluid-solver.xml`（`coolfluid-solver.cxx:82-86`）、`CellTriagLagrangeP1LagrangeP1`（`LagrangeCellTriags.cxx:43`）——全部一致。
+
+### C.10 第七轮复核记录（2026-09，全册通读 + 源码抽查）
+
+本轮对第 0–12 章全文通读，并对未在前六轮深核的"实测"声明做源码级抽查（文件计数、注册名、源码行号、算例配置原文、工具参数）。共发现并**已直接修正正文**的与源码不符项 4 处、口径澄清 2 处：
+
+104. **8.1.3 依赖清单（重要，纠正上一轮的"更正"）**：`install-coolfluid-deps.pl` 的哈希名为 **`my %packages`**（非 `%deps`）；**未注释（激活）条目共 38 个**（非 33/36）；且 **`boost`(1_88_0)、`openmpi`(4.1.6)、`cmake`(3.17.0)、`mvapich2` 均为激活条目**（被注释的只是各旧版本行），清单另含 `google-perftools`。第 103 条修正记录本身有误，正文 8.1.3 与 8.3.3 已按实测重写。
+105. **7.3.4 DoubleCone 路径（重要）**：`plugins/NEQ/testcases/TCNEQ/DoubleCone/` 下**仅有 `Run42_N2/`**（2 个 CFcase）；`Run35_N2` 实际位于**完全气体插件侧** `plugins/NavierStokes/testcases/DoubleCone/Run35_N2`。第 62 条修正记录中"其下有 Run42_N2 与 Run35_N2 两组"的表述有误，正文已改。
+106. **6.2.1 启用方式出处（重要）**：旧版模块清单含 `libRungeKutta2 libForwardEuler` 并标注"实测，Cylinder 系算例"——实测 Cylinder 目录下**无任何算例加载 `libRungeKutta2`**（该库用于 AccPulse `-sfvm` 族与 FlatPlate RDS 算例）。正文已替换为 `cyl_Pg_M15_FVM_1st2nd.CFcase` 的真实 9 库清单（与 0.3.2 一致）并加更正注。
+107. **HLLE 行号微漂**：`HLLE2D` 注册于 `FiniteVolumeNavierStokes/HLLEFlux.cxx:35`（旧记 :29），4.4.7 表与 4.18.3 表已更正。
+108. **口径澄清（5.8.10 vs 5.8.16）**：RadiativeTransfer 源码 61（`.hh+.cxx`）与 63（含 2 个 `.cu`：`ParadeRadiatorCUDA.cu`、`RadiativeTransferFVDOMCUDA.cu`）两数各自成立，5.8.10 已补换算说明；`FluctSplit` 900 = 899 + 1 个 `.c/.cu` 同理成立。
+109. **大纲滞后数据同步**：`plugins/` 全部文件实测 **9747**（本大纲 1.3.4 写 9746，正文第 1/2 章的 9747 无误）；`plugins/AeroCoef/CMakeLists.txt` 实际注册 **10 个库**（`AeroCoef/AeroCoefFS/AeroCoefFVM/AeroCoefFVMNEQ/DataProcessingHeat/AeroCoefFR/AeroCoefSpectralFD/AeroCoefDG/AeroCoefSpectralFV/AeroCoefFRNEQ`），第 72 条修正记录的"8 个"漏 `AeroCoefSpectralFV` 与 `AeroCoefFRNEQ`。
+
+**本轮复核确认无误的关键声明（供信任度参考）**：文件计数（1019 CFcase、135 插件目录、`.hh` 3977/`.cxx` 3347、src 六模块 175/45/40/542/51/201、Mutation2.0I data 191/26 `.mix`/27 `.ceq`、COCONUT 746 `.xz`、Plasmatron 六子目录 2/4/3/7/1/2、TorchNEQ 17、FireII_air11 2、Cylinder 68、AccPulse 30、Naca0012 41、Wedge 23、DoubleEllipse 13、TwoPlates 18、SA FlatPlate 15）；源码行号（`FVMCC_ComputeRHS.cxx:139/:455`（右单元 `+=` 落于 :497）、`RoeFlux.cxx:120/:199`、`BDF2.cxx:101`、`LDASchemeSys.cxx:67`、`FluxReconstructionSolver.cxx:466`、`Euler2DVarSet.cxx:93/:128/:173-196`、`FVMCC_PolyRec.cxx:58/:145`、`NoSlipWallIsothermalNS2D.cxx:100`、`MirrorEuler2D.cxx:80-81`、`TecWriterData.cxx:39`、`ParaWriterData.cxx:40`、`Venktn2D.cxx:58`、`PluginsRegister.hh` 3097 行）；注册名（`FluctuationSplit`、`LoopMaestro`/`SimpleMaestro`（`LMaestro.cxx:33`/`SMaestro.cxx:33`）、`MultiFluidMHD2DRhoiViTi`、`AUSMPlusUpMultiFluid2D`、`RoeVinokurTCNEQ2D`、`Fast`、`Linearized`、`RoeSAGhost`、`AUSMPlusUpIcp_cp`、`AUSMPlusUpTurb3DLTE`、`Venktn3DStrictT3F`、8 个 StopCondition、`NoSlipWallIsothermNS2DFVMCC` 拼写遗留）；MHD 方程数（8/9/9/11，文件:行逐一命中）；算例配置原文（`cyl_Pg_M15_FVM_1st2nd` 全部细节、BrioWu `BDF2` 于 :146 且 FwdEuler/NewtonIterator 被注释、`fire2_1643s_TCNEQ` 的 `refValues`/`nbVibEnergyEqs=1`/`Mutation2OLD.includeElectronicEnergy=true`/`UpdateVar=RhoivtTv`、`doubleEllipseNS_PG` 的 `de.inter` 缺失与 `Tecplot.Data.updateVar` 未消费键、`accpulse2d-sfdm` 的 `RKLS`/`THOR2CFmesh`/`P0`/`Discontinuous`、`burgersFVM` 缺 `libShapeFunctions`）；机制（`### IncludeCase` 于 `NestedConfigFileReader.cxx:86`、AppOptions 11 参数及默认值、`tecplot_merge` argc 3/6、`coef_merge` 两参数、`.CFmesh` 头键序列、k-ω/log-ω 与 SST 实现细节、SA 源项接口名）。
+
+### C.11 第八轮复核记录（2026-09，代码示例可运行性 + 默认值/结构一致性终核）
+
+本轮聚焦**教程与手册示例的"照着抄就能跑"**：对 0.3.x 场景命令、8.3.6 cmake 变量、9.4.3 结构网格转换、第 11 章二次开发教程代码做可运行性核对，并对第 4/6 章声称的参数默认值与第 0/1/2 章结构一致性做源码级复核。共发现并**已直接修正正文**的与源码不符项 4 处、口径澄清 1 处：
+
+110. **9.4.3 结构网格转换注册名（重要）**：旧版示例给 `ConvertBlockMesh / ConvertQuadMesh / ConvertGridProMesh` 作为启用名——**实测三个转换器注册名是 `Block`/`Quad`/`GridPro`**（`plugins/ConvertStructMesh/ConvertBlockMesh.cxx:37` `convertBlockMeshProv("Block")`、`ConvertQuadMesh.cxx:34` `convertQuadMeshProv("Quad")`、`ConvertGridProMesh.cxx:37` `convertGridProMeshProv("GridPro")`），类名 ≠ 注册名。照手册旧示例运行会报 `NoSuchValueException`（找不到 Provider）。正文已改为实测注册名并加更正注。
+111. **11.4.1 `usesTRS()` 归位与默认值双重错误（重要）**：该成员**不在 `NumericalCommand`**，而定义于模板 `MethodCommand<DATA>`（`src/Framework/MethodCommand.hh:94`），且**默认返回 `false`**——旧文把其列入 `NumericalCommand` 清单并写"默认 true：需要 applyTRS"。正文已移出清单并加注：BC 命令必须自行重写 `virtual bool usesTRS() const { return true; }`，否则方法不会注入 TRS 列表。另 `MethodCommand.hh:52-62` 实测签名（`DATA& getMethodData()`、`void setMethodData(const Common::SharedPtr<DATA>&)`）已同步。
+112. **11.4.2/11.4.3 教程骨架 `override` 与项目 C++98 风格不符（重要）**：教程示例 `void setup() override;` 无法在项目原始编译标准下编译——**源码全库 0 处 `override`**（C++98/03 风格，模板返回类型均写作 `> >` 带空格，如 `Method.hh`）。骨架已改回 `virtual` 并加注：若按 8.3.5 节迁移 C++17 虽可编译，仍建议与既有代码风格一致便于对照。
+113. **11.5.1 `Method` 接口签名精确化（次要）**：`getCommandList` 实际签名 `std::vector< Common::SafePtr<NumericalCommand> > getCommandList() const`（`Method.hh:86`，注意 `> >`）；`getStrategyList` 元素类型为 `Common::SafePtr<Framework::NumericalStrategy>`（:93）。正文示例已按实测改写。
+114. **口径澄清（8.3.6 cmake 变量，复核通过无改动）**：本轮开列核对的变量（含 `CF_INSTALL_SUFFIX`/`CF_CMAKE_INSTALL_PREFIX` 等）逐一存在于顶层 `CMakeLists.txt` 与 `cmake/`——正文 8.3.6 命令可原样执行。
+
+**默认值抽查（全部复核通过，正文无需改动）**：① 第 4 章 `Venktn2D.cxx:58` `_coeffEps = 1.0`、`FVMCC_PolyRec.cxx:58` `_limitIter = 1000000000`、`BarthJesp.cxx:47-49` `m_useFullStencil = false` 且正文正确限定为"仅 `BarthJesp3D`"（源码确实 `if (getName() == "BarthJesp3D")`）；② 第 6 章 `PluginsRegister.hh:581` 定义 `registerAll`、`apps/Solver/coolfluid-solver.cxx:165` 处唯一调用、`:304` 默认 `maestro_str = "SimpleMaestro"`——行号与默认值均命中。
+
+**结构一致性抽查（复核通过）**：正文对第 0/1/2 章的一切节号引用（0.3.7、0.4、2.1.2、2.2、2.3、2.7.2 等）逐一与真实标题比对存在且语义对应；11.4 新增教程引用的 8.3.5 节（现代工具链 C++17 迁移，实测清单）确为 `第8章_安装与编译指南.md:186` 的真实小节。文件计数口径沿用 C.8 第 85 条约定。
