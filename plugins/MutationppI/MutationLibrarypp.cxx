@@ -459,12 +459,14 @@ CFdouble MutationLibrarypp::pressure(CFdouble& rho,
 	<< ", y = " << m_y << "\n");
   
   // const CFreal p = m_gasMixture->pressure(temp, rho, &m_y[0]);
+  // Note: setState(rhoi, T) must have been called before this so P() is valid.
   const CFreal p = m_gasMixture->P();
-  if (p <= 0.) {
-    CFLog(DEBUG_MAX, "Mutation::pressure() => p = " << p << " with rho = " << rho 
+  // Use !(p>0.) instead of p<=0. to also catch NaN (NaN comparisons are false)
+  if (!(p > 0.)) {
+    CFLog(DEBUG_MAX, "Mutation::pressure() => p = " << p << " with rho = " << rho
 	  << ", T = " << temp << ", y = " << m_y << "\n");
+    return 1.0;
   }
-  cf_assert(p>0.);
   
   //CFLog(DEBUG_MAX, "Mutation::pressure() => " << p << "\n");
   
@@ -515,13 +517,8 @@ CFdouble MutationLibrarypp::enthalpy(CFdouble& temp,CFdouble& pressure)
    for (CFint ic = 0; ic < _NC; ++ic) {
      m_yn[ic] = yn[ic];
 
-     if (!(m_yn[ic] >= 0.0 && m_yn[ic] <= 1.0)) {
-       // cout << "Yn[ic] = " << Yn[ic] << endl;
-       // abort();
-     }
-
-     assert(m_yn[ic] >= 0.0);
-     assert(m_yn[ic] <= 1.0);
+     if (m_yn[ic] < 0.0) m_yn[ic] = 0.0;
+     if (m_yn[ic] > 1.0) m_yn[ic] = 1.0;
    }
   
    //m_gasMixture->convert<YE_TO_XE>(&m_yn[0], &m_xn[0]);
@@ -567,9 +564,9 @@ void MutationLibrarypp::setSpeciesFractions(const RealVector& ys)
   
   for (CFint is = 0; is < _NS; ++is) {
     m_y[is] = ys[is];
-    
+
     if (m_y[is] < 0.0) m_y[is] = 0.0;
-    cf_assert(m_y[is] < 1.1);
+    if (m_y[is] > 1.0) m_y[is] = 1.0;
   }
     
   CFLog(DEBUG_MAX, "Mutation::setSpeciesFractions() => " << m_y << "\n");

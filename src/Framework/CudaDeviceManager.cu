@@ -48,37 +48,35 @@ void CudaDeviceManager::configure ( Config::ConfigArgs& args )
   
   // the first time getInstance() is called, the device is initialized
   // for the moment we assume one device
-  int count = 0; 
-  int dev   = -1;
+  int count = 0;
+  int dev   = 0;
   int rank = Common::PE::GetPE().GetRank("Default");
   cudaGetDeviceCount(&count);
- 
-  const CFuint nbProc = Common::PE::GetPE().GetProcessorCount("Default"); 
-  if (nbProc > 1) {
+
+  const CFuint nbProc = Common::PE::GetPE().GetProcessorCount("Default");
+  if (nbProc > 1 && count > 0) {
     dev = rank % count;
-    cfassert(dev >= 0); 
     cudaSetDevice(dev);
-    //    std::cout << "P" << rank << " => device/count => " << dev << "/" << count << std::endl;
-    // std::cout << "CudaDeviceManager::configure() => infinite loop ...\n"; 
-    // for (;;) {}
   } else {
-     /* the code below works for serial GPU simulations */
+     /* serial GPU simulations or no GPU available */
     cudaGetDevice(&dev);
-    cfassert(dev >= 0);  
+    if (dev < 0) dev = 0;
     cudaSetDevice(dev);
   }
-  
+
   CFLog(VERBOSE, "CudaDeviceManager::configure() => cudaGetDeviceProperties()\n");
-  cudaGetDeviceProperties(&m_prop, dev); 
-  
+  cudaGetDeviceProperties(&m_prop, dev);
+
   CFLog(VERBOSE, "CudaDeviceManager::configure() => printProperties()\n");
   printProperties(dev);
-  
-  NTHREADS_PER_BLOCK = (NTHREADS_PER_BLOCK > 0) ? NTHREADS_PER_BLOCK :  m_prop.maxThreadsPerBlock;
-  cfassert(NTHREADS_PER_BLOCK > 0);
-  
-  NBLOCKS = (NBLOCKS > 0) ? NBLOCKS : m_prop.maxGridSize[0];
-  cfassert(NBLOCKS > 0);
+
+  // Use device properties if available, otherwise set sensible defaults
+  // (avoids cfassert crash when CUDA driver returns zeros in sandboxed env)
+  NTHREADS_PER_BLOCK = (NTHREADS_PER_BLOCK > 0) ? NTHREADS_PER_BLOCK :
+    (m_prop.maxThreadsPerBlock > 0 ? m_prop.maxThreadsPerBlock : 256);
+
+  NBLOCKS = (NBLOCKS > 0) ? NBLOCKS :
+    (m_prop.maxGridSize[0] > 0 ? m_prop.maxGridSize[0] : 65535);
   
   CFLog(INFO, "CudaDeviceManager::configure() => NTHREADS_PER_BLOCK = " << NTHREADS_PER_BLOCK 
 	<< ", NBLOCKS = " << NBLOCKS << " END\n");

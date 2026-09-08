@@ -1,0 +1,102 @@
+###############################################################################
+#
+# 1D chemical-nonequilibrium shock tube (air_5, Park chemistry via Mutation++)
+# Driver: T=5000 K, p=1e5 Pa (molecular air) | Driven: T=300 K, p=1000 Pa
+#
+# Pseudo-time marching with NewtonIterator + PseudoSteadyTimeRhs.
+# The Norm stop condition was the root cause of the "RHS=0 / residual=-DBL_MAX"
+# issue: on the first pseudo-time step U=U_old so dt/dU=0, making the residual
+# zero; log10(0) = -inf < -4.0 so the solver exited immediately.
+# Using MaxNumberSteps forces the solver to march regardless of residual.
+# Small CFL (0.01) handles the stiff chemistry at 5000 K driver.
+#
+###############################################################################
+Simulator.Modules.Libs = libShapeFunctions libCFmeshFileWriter libCFmeshFileReader libTecplotWriter libNavierStokes libNEQ libFiniteVolume libFiniteVolumeNavierStokes libFiniteVolumeNEQ libNewtonMethod libPetscI libMutationppI libMeshGenerator1D libMeshTools libMeshToolsFVM
+
+CFEnv.ExceptionDumps       = true
+CFEnv.ExceptionOutputs     = true
+
+Simulator.Paths.WorkingDir = plugins/NEQ/testcases/TCNEQ/ShockTube
+Simulator.Paths.ResultsDir = ./RESULTS_ST_air5_MPP
+
+Simulator.SubSystem.Default.PhysicalModelType = Euler1DNEQ
+Simulator.SubSystem.Euler1DNEQ.refValues = 0.011611 0.011611 0.011611 0.011611 0.011611 1000. 300.
+Simulator.SubSystem.Euler1DNEQ.refLength = 1.0
+Simulator.SubSystem.Euler1DNEQ.PropertyLibrary = Mutationpp
+Simulator.SubSystem.Euler1DNEQ.Mutationpp.mixtureName = air_5
+Simulator.SubSystem.Euler1DNEQ.Mutationpp.StateModelName = ChemNonEq1T
+Simulator.SubSystem.Euler1DNEQ.Mutationpp.MinT = 100.
+Simulator.SubSystem.Euler1DNEQ.Mutationpp.MinRhoi = 1e-9
+Simulator.SubSystem.Euler1DNEQ.nbSpecies = 5
+Simulator.SubSystem.Euler1DNEQ.nbEulerEqs = 2
+Simulator.SubSystem.Euler1DNEQ.nbVibEnergyEqs = 0
+
+Simulator.SubSystem.ConvergenceFile     = convergence.plt
+
+Simulator.SubSystem.OutputFormat        = CFmesh Tecplot
+Simulator.SubSystem.CFmesh.FileName     = shocktube_air5.CFmesh
+Simulator.SubSystem.CFmesh.SaveRate = 200
+Simulator.SubSystem.Tecplot.FileName    = shocktube_air5.plt
+Simulator.SubSystem.Tecplot.Data.updateVar = Rhoivt
+Simulator.SubSystem.Tecplot.SaveRate = 100
+Simulator.SubSystem.Tecplot.WriteSol = WriteSolution1D
+Simulator.SubSystem.Tecplot.AppendIter = true
+
+# KEY FIX: MaxNumberSteps (not Norm!) to prevent false "convergence" on step 1
+Simulator.SubSystem.StopCondition       = MaxNumberSteps
+Simulator.SubSystem.MaxNumberSteps.nbSteps = 2000
+
+Simulator.SubSystem.Default.listTRS = InnerFaces Inlet Outlet
+
+Simulator.SubSystem.MeshCreator = CFmeshFileReader
+Simulator.SubSystem.CFmeshFileReader.Data.FileName = ./shocktube_air5.CFmesh
+
+# Implicit pseudo-time marching (Newton + PseudoSteadyTimeRhs)
+Simulator.SubSystem.LinearSystemSolver = PETSC
+Simulator.SubSystem.LSSNames = NewtonIteratorLSS
+Simulator.SubSystem.NewtonIteratorLSS.Data.PCType = PCASM
+Simulator.SubSystem.NewtonIteratorLSS.Data.KSPType = KSPGMRES
+Simulator.SubSystem.NewtonIteratorLSS.Data.MatOrderingType = MATORDERING_RCM
+Simulator.SubSystem.NewtonIteratorLSS.Data.NbKrylovSpaces = 200
+Simulator.SubSystem.NewtonIteratorLSS.Data.MaxIter = 500
+Simulator.SubSystem.NewtonIteratorLSS.Data.RelativeTolerance = 1e-4
+
+Simulator.SubSystem.ConvergenceMethod = NewtonIterator
+Simulator.SubSystem.NewtonIterator.Data.CFL.Value = 0.001
+Simulator.SubSystem.NewtonIterator.Data.L2.MonitoredVarID = 6
+Simulator.SubSystem.NewtonIterator.Data.FilterState = Max
+Simulator.SubSystem.NewtonIterator.Data.Max.maskIDs = 1 1 1 1 1 0 1
+Simulator.SubSystem.NewtonIterator.Data.Max.minValues = 1e-9 1e-9 1e-9 1e-9 1e-9 0. 200.
+Simulator.SubSystem.NewtonIterator.ShowRate = 100
+
+Simulator.SubSystem.SpaceMethod = CellCenterFVM
+Simulator.SubSystem.CellCenterFVM.ComputeRHS = NumJacob
+Simulator.SubSystem.CellCenterFVM.ComputeTimeRHS = PseudoSteadyTimeRhs
+
+Simulator.SubSystem.CellCenterFVM.Data.FluxSplitter = AUSMPlusMS1D
+Simulator.SubSystem.CellCenterFVM.Data.AUSMPlusMS1D.choiceA12 = 5
+
+Simulator.SubSystem.CellCenterFVM.Data.SourceTerm = Euler1DCNEQST
+
+Simulator.SubSystem.CellCenterFVM.Data.UpdateVar   = Rhoivt
+Simulator.SubSystem.CellCenterFVM.Data.SolutionVar = Cons
+
+Simulator.SubSystem.CellCenterFVM.Data.PolyRec = Constant
+
+Simulator.SubSystem.CellCenterFVM.InitComds = InitState
+Simulator.SubSystem.CellCenterFVM.InitNames = InField
+# air_5 species order: [N, O, NO, N2, O2]
+Simulator.SubSystem.CellCenterFVM.InField.applyTRS = InnerFaces
+Simulator.SubSystem.CellCenterFVM.InField.Vars = x
+Simulator.SubSystem.CellCenterFVM.InField.Def = \
+	if(x<0.5,1e-9,1e-9) if(x<0.5,1e-9,1e-9) if(x<0.5,1e-9,1e-9) \
+	if(x<0.5,0.053486,0.008914) if(x<0.5,0.016183,0.002697) 0.0 if(x<0.5,5000.,300.)
+
+Simulator.SubSystem.CellCenterFVM.BcComds = MirrorVelocityFVMCC MirrorVelocityFVMCC
+Simulator.SubSystem.CellCenterFVM.BcNames = Jet1 Jet2
+
+Simulator.SubSystem.CellCenterFVM.Jet1.applyTRS = Inlet
+Simulator.SubSystem.CellCenterFVM.Jet1.VelocityIDs = 5
+
+Simulator.SubSystem.CellCenterFVM.Jet2.applyTRS = Outlet
+Simulator.SubSystem.CellCenterFVM.Jet2.VelocityIDs = 5

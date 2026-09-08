@@ -154,6 +154,7 @@ int main(int argc, char** argv)
 {
   using namespace boost;
   namespace fs = boost::filesystem;
+  namespace fs = boost::filesystem;
 
   
 #ifdef CF_HAVE_SINGLE_EXEC

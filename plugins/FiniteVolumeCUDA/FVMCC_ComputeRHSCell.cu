@@ -583,7 +583,7 @@ void FVMCC_ComputeRHSCell<SCHEME,PHYSICS,POLYREC,LIMITER,NB_BLOCK_THREADS>::exec
   SafePtr<POLYREC> pr = getMethodData().getPolyReconstructor().template d_castTo<POLYREC>();
   SafePtr<LIMITER> lm = getMethodData().getLimiter().template d_castTo<LIMITER>();
   SafePtr<typename PHYSICS::PTERM> phys = PhysicalModelStack::getActive()->getImplementor()->
-    getConvectiveTerm().d_castTo<typename PHYSICS::PTERM>();
+    getConvectiveTerm().template d_castTo<typename PHYSICS::PTERM>();
   
 #ifdef CF_HAVE_CUDA
   typedef typename SCHEME::template DeviceFunc<GPU, PHYSICS> FluxScheme;  

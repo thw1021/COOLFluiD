@@ -57,6 +57,7 @@ void PetscOptions::setPCTypes()
 #ifdef CF_HAVE_CUDA
 #if PETSC_VERSION_MINOR>=13
   // PCSACUSP and friends were removed starting from PETSc 3.13
+  // PCSACUSP and friends were removed starting from PETSc 3.13
 #else
   _pcType["PCSACUSP"]    = PCSACUSP;
   _pcType["PCSACUSPPOLY"] = PCSACUSPPOLY;

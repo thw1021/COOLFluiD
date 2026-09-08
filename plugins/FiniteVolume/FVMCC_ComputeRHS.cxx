@@ -219,14 +219,14 @@ void FVMCC_ComputeRHS::execute()
 	  
 	  // extrapolate (and LIMIT, if the reconstruction is linear or more)
 	  // the solution in the quadrature points
-	  _polyRec->extrapolate(_currFace);
-	
-	  // compute the physical data for each left and right reconstructed
-	  // state and in the left and right cell centers
-	  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => before computePhysicalData()\n");
-	  computePhysicalData();
-	  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => after computePhysicalData()\n");
-	  
+		  _polyRec->extrapolate(_currFace);
+
+		  // compute the physical data for each left and right reconstructed
+		  // state and in the left and right cell centers
+		  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => before computePhysicalData()\n");
+		  computePhysicalData();
+		  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => after computePhysicalData()\n");
+
 	  // a jacobian free method requires to re-compute the update coefficient every time the 
 	  // residual is calculated to get F*v from the finite difference formula
 	  // in particular the time dependent part of the residual depend on a updateCoeff
@@ -240,16 +240,16 @@ void FVMCC_ComputeRHS::execute()
 	  
 	  // this initialization is fundamental, especially for cases with coupling
 	  // where some equation subsystems don't have convective terms
-	  _flux = 0.; 
-	  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => before conv computeFlux()\n");
-	  if (!isBFace) {
-	    _fluxSplitter->computeFlux(_flux);
+	  _flux = 0.;
+		  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => before conv computeFlux()\n");
+		  if (!isBFace) {
+		    _fluxSplitter->computeFlux(_flux);
 
 
-	  }
-	  else {
-	    _currBC->computeFlux(_flux);
-	  }
+		  }
+		  else {
+		    _currBC->computeFlux(_flux);
+		  }
 	  CFLog(DEBUG_MIN, "FVMCC_ComputeRHS::execute() => after conv computeFlux()\n");
 	  // cout.precision(12);cout << currTrs->getName() << " C flux = " << _flux << endl;
 	  

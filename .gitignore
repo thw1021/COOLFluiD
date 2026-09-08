@@ -1,10 +1,32 @@
+# Build and install directories
 build/
 install/
-plugins/NEQ/testcases/TCNEQ/Hornung/coarse.CFmesh
+
+# Calculation results and logs (located under testcase folders)
+plugins/NEQ/testcases/TCNEQ/*/results/
+plugins/NEQ/testcases/TCNEQ/*/logs/
+plugins/NEQ/testcases/TCNEQ/logs/
+
+# Legacy root-level result directories (safety patterns)
+RESULTS_*/
+RESULT_*/
+
+# Python cache and compiled objects
+__pycache__/
+*.pyc
+doc/validation/__pycache__/
+
+# Compiled CUDA shim (source fakecuda.c is tracked)
+doc/validation/libfakecuda.so
+doc/validation/fakecuda.map
+
+# Stray runtime outputs
 --help_iter_0.plt
 burgersFVM.CFmesh
 burgersFVM.plt
 convergence.plt.Default
 P0-output.log
 plugins/Burgers/testcases/burgers.CFmesh
+
+# IDE and tool artifacts
 .codebuddy/

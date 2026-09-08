@@ -300,15 +300,23 @@ void Euler1DNEQRhoivt::computePerturbedPhysicalData
 
 //////////////////////////////////////////////////////////////////////////////
 
-void Euler1DNEQRhoivt::setThermodynamics(CFreal rho, 
-					 const State& state, 
-					 RealVector& data)
+void Euler1DNEQRhoivt::setThermodynamics(CFreal rho,
+						 const State& state,
+						 RealVector& data)
 {
   const CFuint nbSpecies = getModel()->getNbScalarVars(0);
   const RealVector& refData = getModel()->getReferencePhysicalData();
   CFreal rhodim = rho*refData[EulerTerm::RHO];
   CFreal T = state[getTempID(nbSpecies)];
   CFreal Tdim = T*refData[EulerTerm::T];
+
+  // FIX: must call setState with species partial densities and temperature
+  // before querying any thermodynamic quantity (pressure, enthalpy, gamma, etc.)
+  // This mirrors the 2D implementation in Euler2DNEQRhoivt::setThermodynamics.
+  // Without this, m_gasMixture->P() returns stale/NaN values and fluxes are NaN.
+  CFreal* rhoi = &const_cast<State&>(state)[0];
+  _library->setState(rhoi, &Tdim);
+
   CFreal pdim = _library->pressure(rhodim, Tdim, CFNULL);
   CFreal p = pdim/refData[EulerTerm::P];
   
