@@ -1,43 +1,24 @@
 #!/bin/bash
-# unzip large files for COCONUT regression testcases
-if [ -e plugins/MHD/testcases/COCONUT/Dipole_WTD/30Rs.CFmesh.xz ]; then
-   unxz plugins/MHD/testcases/COCONUT/Dipole_WTD/30Rs.CFmesh.xz 
-fi
-if [ -e plugins/MHD/testcases/COCONUT/Dipole_Shifted/2008_lmax25.dat.xz ]; then
-   unxz plugins/MHD/testcases/COCONUT/Dipole_Shifted/2008_lmax25.dat.xz 
-fi
-if [ -e plugins/MHD/testcases/COCONUT/Dipole_Shifted/2Rslvl6.CFmesh.xz ]; then
-   unxz plugins/MHD/testcases/COCONUT/Dipole_Shifted/2Rslvl6.CFmesh.xz
-fi
-cd plugins/MHD/testcases/COCONUT/Eclipse/Mesh
-if compgen -G "*.xz" > /dev/null; then
-## file was split using:
-## split -b 40m corona_720.CFmesh corona_720.CFmesh.  
-## this reassembles the original file
-   unxz corona_720.CFmesh.*
-   cat corona_720.CFmesh.?? > corona_720.CFmesh
-fi
-cd -
-cd plugins/MHD/testcases/COCONUT/Eclipse/MapData
-if compgen -G "*.xz" > /dev/null; then
-   unxz map_gong_lmax25*
-fi
-cd -
-cd plugins/MHD/testcases/COCONUT/Eclipse600/Mesh
-if compgen -G "*.xz" > /dev/null; then
-## file was split using:
-## split -b 40m L6corona_PPDecEBC2_2024zqsLax025NHom.CFmesh L6corona_PPDecEBC2_2024zqsLax025NHom.CFmesh.  
-## this reassembles the original file
-   unxz L6corona_PPDecEBC2_2024zqsLax025NHom.CFmesh.*
-   cat L6corona_PPDecEBC2_2024zqsLax025NHom.CFmesh.?? > L6corona_PPDecEBC2_2024zqsLax025NHom.CFmesh
-fi
-cd -
-cd plugins/MHD/testcases/COCONUT/Eclipse600/MapData/First600
-if compgen -G "*.xz" > /dev/null; then
-   unxz map_gong_lmax50_20240*
-fi
-cd -
-if [ -e plugins/RadiativeTransfer/testcases/SolarCorona/corona_fullMHD.CFmesh.xz ]; then
-   unxz plugins/RadiativeTransfer/testcases/SolarCorona/corona_fullMHD.CFmesh.xz 
-fi
-echo "######## init_testcases done! ########"
+# ============================================================
+# init_testcases.sh
+# 原用途：解压测试算例的大文件 (.xz -> .dat / .CFmesh)
+#
+# 当前状态：已禁用 (no-op)
+# ------------------------------------------------------------
+# 原因：
+#   * 解压后会在 git 工作区产生 1500+ 文件变更（740 个 .xz
+#     被删 + 740+ 个解压产物），导致 git 提交缓慢、仓库膨胀
+#     约 6.6 GB。
+#   * 这些 .dat / .CFmesh 仅作为 cf_add_case 注册的算例输入
+#     数据使用，并非编译 coolfluid-solver 或其库的依赖，对
+#     编译结果无影响（CMakeLists.txt 中没有任何 ADD_LIBRARY /
+#     ADD_EXECUTABLE 引用它们作为编译输入）。
+#   * 若实际需要运行 COCONUT / SolarCorona / AdvectSinusWave
+#     等算例，请在此脚本中临时恢复对应的解压逻辑，或手动
+#     `unxz <file>.xz`。
+#
+# CMakeLists.txt 中通过 execute_process() 调用本脚本，失败会
+# 触发 FATAL_ERROR 中止 cmake。此处保持返回 0 以兼容。
+# ============================================================
+echo "######## init_testcases.sh: no-op (skipped to keep .xz archives) ########"
+exit 0
