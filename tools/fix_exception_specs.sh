@@ -63,7 +63,9 @@ for f in \
   src/Framework/NegativeVolumeException.hh \
   src/Framework/TrsNotFoundException.hh \
   src/MathTools/FindMinimum.hh \
-  src/MathTools/OutOfBoundsException.hh
+  src/MathTools/OutOfBoundsException.hh \
+  plugins/ExplicitFilters/FilterException.hh \
+  plugins/CGNS2CFmesh/CGNSException.hh
 do
   sed -i 's/throw()//' "$f"
 done

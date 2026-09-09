@@ -23,8 +23,10 @@ echo ""
 echo "[1/4] apps/Solver - filesystem 命名冲突 ..."
 SOLVER_FILE="apps/Solver/coolfluid-solver.cxx"
 if [ -f "$SOLVER_FILE" ]; then
-  # 在 "using namespace boost;" 下方添加 namespace fs = boost::filesystem;
-  sed -i '/using namespace boost;/a\  namespace fs = boost::filesystem;' "$SOLVER_FILE"
+  # 仅当不存在 namespace fs 行时才添加（幂等）
+  if ! grep -q 'namespace fs = boost::filesystem;' "$SOLVER_FILE"; then
+    sed -i '/using namespace boost;/a\  namespace fs = boost::filesystem;' "$SOLVER_FILE"
+  fi
   # 将 standalone 的 filesystem:: 替换为 fs::
   sed -i 's/boost::filesystem::/fs::/g' "$SOLVER_FILE"
   sed -i 's/\bfilesystem::/fs::/g'       "$SOLVER_FILE"

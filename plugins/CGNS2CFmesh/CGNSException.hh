@@ -43,7 +43,7 @@ public:
    * A copy constructor is necessary for exceptions, for the C++
    * exception mechanism to work.
    */
-  CGNSException(const CGNSException& e) throw() : Exception(e)
+  CGNSException(const CGNSException& e) : Exception(e)
   {
   }
 

@@ -26,7 +26,7 @@ public:
     
   /// A copy constructor is necessary for exceptions, for the C++
   /// exception mechanism to work.
-  FilterException(const FilterException& e) throw() : Common::Exception(e) {}
+  FilterException(const FilterException& e) : Common::Exception(e) {}
     
 }; // end of class FilterException
 
