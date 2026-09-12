@@ -2,7 +2,15 @@
 
 > 评估对象：`/home/tang/packages/COOLFluiD` 工作区（master 分支）
 > 评估方式：逐一读取全部相关 `*.CFcase` 配置文件与配套网格文件的真实内容，并核实本机构建产物（`build/optim/dso`、`install/bin`）
-> 日期：2026-08-28
+> 日期：2026-08-28（**2026-09-12 更新**：补充各算例实际运行验证状态，见 §6；运行验证细节与超算说明见 `VALIDATION_REPORT.md`）
+
+## 版本时间线（倒序）
+
+| 日期 | 事件 |
+|------|------|
+| **2026-09-12** | **更新**：新增 §6 运行验证状态（21 算例族四档归类 + 本轮新建文件清单 + 完成度结论）；修正 §4"开箱即跑"清单——实际运行核查发现原版 M++ 算例混合物名失效且缺 libShapeFunctions，真正开箱即跑的为本轮适配的 4 族算例；修正 §2.10 ShockTube 结论（Mpp 变体恢复可运行） |
+| 2026-08-28 | **初版**：43 个 `.CFcase` 逐一静态评估（算例配置、输入齐全性、可运行性、物理特征索引） |
+| 2026-09-05 ~ 09-12 | （非本报告范围）实际运行验证分阶段开展：详见 `VALIDATION_REPORT.md` 版本时间线 |
 
 ---
 
@@ -24,7 +32,7 @@
 2. **化学反应模型全部为 Park 系列**（park5 / park5T / parkN2 / parkair93 / parkair93cneq）+ Nompelis（nompelisN2，双锥）+ 1 个 CR 模型（Abba_At）；**仓库中没有 Dunn-Kang 模型算例**。
 3. **热化学库 5 种**：Mutation 1.x（旧 F77）、Mutation2OLD（F77 v2.0）、Mutation2、Mutation++（M++）、PLATO。
 4. **空间方法两大类**：单元中心有限体积 FVM（通量几乎全部为 AUSM+ 多组元版 `AUSMPlusMS`/`AUSMPlusUpMS`，Venkatakrishnan 限制器）与残差分布 RDS/FluctSplit（DoubleCone 的 CRD+Gnoffo 激波捕捉、Prabhu 的 CRD+SysNC）。
-5. **可运行性**：输入文件（网格/重启解/交互文件）**齐全**的算例 17 个；缺网格或缺数据的 26 个。结合**本机构建仅编译了 Mutation++ 接口**（`libMutationppI.so`，旧版 Mutation/Mutation2OLD/PLATO 均未编译），**当前构建下真正开箱即跑的只有 7 个算例**（见 §4）。
+5. **可运行性**：输入文件（网格/重启解/交互文件）**齐全**的算例 17 个；缺网格或缺数据的 26 个。结合**本机构建仅编译了 Mutation++ 接口**（`libMutationppI.so`，旧版 Mutation/Mutation2OLD/PLATO 均未编译），**当前构建下真正开箱即跑的只有 7 个算例**（见 §4；**2026-09-12 修正**：实际核查发现原版 M++ 算例混合物名失效且缺 libShapeFunctions，真正开箱即跑的为本轮适配的 4 族算例，详见 §4 修正块与 §6）。
 
 ---
 
@@ -289,6 +297,21 @@
 5. `NEQ/testcases/TCNEQ/FireII/fire2_1643s_CNEQ_M++.CFcase`（FIRE II 再入，air11）
 6. `LTE/testcases/IXV/ixvLTE_Mutation++.CFcase` 与 `ixvLTE_Euler_Mutation++.CFcase`（LTE Ma25；**需先 `gunzip CATE_v7_small.neu.gz`**）
 
+> **2026-09-12 修正（实际运行核查后发现）**：上列"开箱即跑"判断基于静态审查，
+> 存在两点系统性偏差——
+> ① **原版 M++ 算例的混合物名在当前 Mutation++ 数据库中已全部失效**
+> （`N2_neut`/`N2_TTv`/`air11` 不存在；现库仅有 `n2_2`/`air_5`/`air_11`/
+> `CO2_8`/`Mars_19`/`tacot-air_35`，已核实 `data/mixtures/` 目录）；
+> ② 原版 M++ 算例的 `Simulator.Modules.Libs` 均缺首位 `libShapeFunctions`
+> （非 single-exec 构建下触发 GeometricEntityRegister 断言崩溃）。
+> 因此**真正开箱即跑的只有本轮适配过的 4 族算例**：Hornung Euler n2_2 系列
+> （`hornung_FVM_NS_CNEQ_EULER_n2_2*.CFcase`）、`DConeN2_42_FVM_M++.CFcase`、
+> `fire2_1643s_CNEQ_Mpp*.CFcase`、`shocktubeNEQ_air5_Mpp.CFcase`。上列原版
+> M++ 变体（Hornung NS CNEQ/TCNEQ/MeFiAlgo/Debug、IXV LTE M++ ×2）需先做
+> 两处适配（mixtureName 改现名 + Modules.Libs 首位加 libShapeFunctions，
+> 改法参照 `hornung_FVM_NS_CNEQ_EULER_n2_2.CFcase`）方可运行；Mach38 仍需
+> 外部混合物数据。各算例实际运行状态见 §6。
+
 **补齐旧版 Mutation 库后可增加运行**：FireII 其余 4 个、DoubleCone 2 个、CateIXV、Nozzle1D 2 个、ArcJet phi 系列 3 个（输入均已齐全）。
 
 **缺失输入、需另行获取网格/数据的**：Catalicity ×2（mesh-cylind.neu）、PrabhuCylinder（grid2.neu）、ShockTube（ParametersST.CFmesh）、ICP2Cat（start6000.CFmesh）、EXPERT3D（expert.CFmesh.START/EXPERT.dat）、ArcJet 8flow/3D 全部 11 个（SOL/ArcJet3D.CFmesh）、ScalingTest（Tube188300.CFmesh）。
@@ -310,3 +333,52 @@
 - **电磁耦合（焦耳加热）**：ArcJet 全部
 - **湍流**：ArcJet SALTE 系列（Spalart-Allmaras 一方程，LTE 湍流）；其余高焓算例均为层流
 - **3D 算例**：EXPERT3D（后处理）、ArcJet 全部 15 个；其余 NEQ/LTE 算例均为 2D/2D 轴对称/1D
+
+---
+
+## 6. 算例运行验证状态（2026-09-12 更新）
+
+本节为 §1–§5 静态评估的**实际运行状态补充**：2026-09-05 至 09-08 期间以
+Mutation++（外部接口，未改源码）为物性库，对可运行算例开展了实际运行验证。
+逐项核查结果目录/日志/配置后的四档归类如下，证据链与定量对比详见
+`VALIDATION_REPORT.md`。
+
+### 6.1 运行状态总表（对应 §3 全量汇总表编号）
+
+| # | 算例 | 运行状态 | 说明 |
+|---|---|---|---|
+| 1–6 | Hornung 系列 | **#3 的自建 n2_2 变体已运行并定量验证**；原版 M++ 变体需先适配 | 本轮自建 Euler CNEQ 变体 `hornung_FVM_NS_CNEQ_EULER_n2_2*.CFcase`（V3 调度版）：38054 步收敛，δ/R=0.31 vs 实验 0.22，近壁热力学态与 mppshock 平衡解偏差 ≤5%（**唯一完成定量对比验证的算例**）。细网格 V5 系列三次失败（缩放 bug/CFL 失稳/物理无效）。原版 M++ 变体（#1/#2/#4 NS CNEQ/TCNEQ/MeFiAlgo）因混合物名失效+缺 libShapeFunctions 需先适配（见 §4 修正）；TCNEQ M++（#2）列为超算可选算例 |
+| 7–8 | FireII | **部分运行**（M++ 变体） | 本轮适配 `fire2_1643s_CNEQ_Mpp.CFcase`（air_11 重排）：冻结相物理有效（iter_1000）；化学相 run1/run2 均发散（11 组元化学刚性），与飞行数据的定量对比待超算（策略已备） |
+| 9 | DoubleCone Run42 | **冒烟通过，生产待超算**（M++ 变体） | 本轮适配 `DConeN2_42_FVM_M++.CFcase`（n2_2、ChemNonEqTTv、来流 Tv=3160 K、MeFiAlgo 禁用）：越过全部历史崩溃点；CFcase 当前为冒烟配置（nbSteps=100），生产配置修改清单与对比方法见 `VALIDATION_REPORT.md` §8.1。**论文主锚点（Lani 2009 图 6.18/6.19）** |
+| 10 | CateIXV | ✘ 未运行 | 缺 Mutation2OLD 库（同 §3 结论） |
+| 11 | IXV LTE M++ | 未运行（需先适配） | LTE 平衡气体，未纳入本轮非平衡验证主线；原版 mixtureName `air11` 已失效、缺 libShapeFunctions，需两处适配（见 §4 修正）后留作扩展 |
+| 12 | IXV LTE（Mut2OLD） | ✘ 未运行 | 缺库 |
+| 13 | SphereCO2 Mach38 | ✘ 未运行 | 缺外部 M++ 混合物数据 air7_sahadeo_reordered（同 §3 结论） |
+| 14 | Catalicity ×2 | ✘ 未运行 | 缺网格 mesh-cylind.neu |
+| 15 | PrabhuCylinder | ✘ 未运行 | 缺网格 grid2.neu |
+| 16 | Nozzle1D | ✘ 未运行 | 缺 Mutation2 库 |
+| 17 | ShockTube | **部分运行**（Mpp 变体） | **修正 §2.10 结论**：原 `shocktubeNEQ.CFcase` 缺 `ParametersST.CFmesh` 不可跑，但本轮新建 Mpp 变体 `shocktubeNEQ_air5_Mpp.CFcase`（自带 `shocktube_air5.CFmesh`/`ParametersShock_neq.CFmesh`）可运行；修复 1D 变量集缺 `setState()` 缺陷后 6/7 残差收敛至 −6，T 分量停滞，瞬态解析对比未通过 |
+| 18 | ICP2Cat | ✘ 未运行 | 缺网格 start6000.CFmesh |
+| 19 | EXPERT3D | ✘ 未运行 | 缺 3D 收敛解与 EXPERT.dat |
+| 20–21 | ArcJet ×15 | ✘ 未运行 | 缺库/缺输入（同 §3 结论） |
+| — | SU2 NEMO 交叉对比 | **完成（定性）** | 只读 SU2 HEG 圆柱结果交叉对比，壁面压力形状一致（SU2 未充分收敛，仅定性） |
+
+### 6.2 本轮新建/修改的算例文件（COOLFluiD 侧，未改 Mutation++）
+
+| 文件 | 说明 |
+|---|---|
+| `plugins/NEQ/testcases/TCNEQ/Hornung/hornung_FVM_NS_CNEQ_EULER_n2_2*.CFcase`（含 V2/V3/V5/V5c 等变体） | Hornung Euler CNEQ 适配与网格收敛系列；**V3 为定量基准**，V5 系列作废（结果归档于各 RESULTS_* 目录） |
+| `plugins/NEQ/testcases/TCNEQ/DoubleCone/Run42_N2/DConeN2_42_FVM_M++.CFcase` | Run42 TCNEQ M++ 适配（物种重排、来流一致初始化、MeFiAlgo 禁用、钳位） |
+| `plugins/NEQ/testcases/TCNEQ/FireII/fire2_1643s_CNEQ_Mpp*.CFcase`（frozen/run/run2/smoke 变体） | FireII M++ 适配与两阶段策略变体 |
+| `plugins/NEQ/testcases/TCNEQ/ShockTube/shocktubeNEQ_air5_Mpp.CFcase` + 网格/参数文件 | 1D 激波管 Mpp 变体（使本算例恢复可运行） |
+| `plugins/NEQ/Euler1DNEQRhoivt.cxx`（源码修复） | 补 `_library->setState()` 调用（RHS≡0 根因）；`plugins/FiniteVolume/FVMCC_ComputeRHS.cxx` 清理调试输出 |
+
+### 6.3 完成度结论
+
+- **已确认完成对比验证**：Hornung N2 圆柱 V3（定量）、Mutation++ 库核查、SU2 交叉对比（定性）——3 项；
+- **部分完成**：FireII（冻结相有效/化学相发散）、ShockTube（推进但 T 分量停滞）、Hornung 细网格（三连败）——3 项；
+- **待超算运行验证**：DoubleCone Run42（最高优先级）、FireII 化学相、Hornung 细网格 V6 方案，另可选 Hornung TCNEQ M++ 与 HEG 空气圆柱——3+2 项；
+- **本机不可行**：其余全部（缺旧库 12 个算例族、缺输入 6 个，见 §3/§4）。
+
+超算运行的环境重建前提、生产配置修改清单、运行命令与对比方法集中在
+`VALIDATION_REPORT.md` §8。

@@ -1,6 +1,39 @@
 # COOLFluiD 高焓流动验证报告
 
-日期：2026-09-07（2026-09-08 第二次复核；2026-09-08 第三次修订：系统性修复；2026-09-08 第四次修订：V5c/run2 完成与诊断）｜ 版本：复核修订版 ｜ 状态：V5c/run2 已完成，物理有效性诊断完成
+日期：2026-09-07（2026-09-08 第二次复核；2026-09-08 第三次修订：系统性修复；2026-09-08 第四次修订：V5c/run2 完成与诊断；**2026-09-12 第五次修订：完成度系统核查与超算运行说明**）｜ 版本：复核修订版 ｜ 状态：Hornung V3 定量验证完成；FireII 化学相/双锥 Run42/细网格待超算（§0 与 §8）
+
+## 版本时间线（倒序）
+
+| 日期 | 事件 |
+|------|------|
+| **2026-09-12** | **第五次修订**：完成度系统核查（结果目录/日志/CFcase/脚本逐一核实），新增 §0 完成度总览与 §8 超算运行说明；同日复核修正——发现原版 M++ 算例混合物名失效问题（§8.3/§8.4）、FireII inter 文件二阶开关依赖（§8.2）、趋势日志实际路径、jesus0/14641 网格脉络澄清（§3.2） |
+| 2026-09-08 | **第二次复核**：修正冻结/平衡脱体距离排序错误，改用 Mutation++ `mppshock` 正激波解作定量参考 → **第三次修订**：系统性修复 4 项（Hornung V5 网格缩放 bug、ShockTube 1D `setState` 缺失、FireII 两阶段策略、MutationppI 适配层数值鲁棒化）→ **第四次修订**：V5b/V5c 细网格复跑与诊断（V5b CFL=10 失稳、V5c 50000 步完成但物理无效）、FireII 化学相 run1/run2 发散诊断 |
+| 2026-09-07 | **报告初版**：Hornung V3 定量验证（38054 步收敛、4 准则激波定位复核）、SU2 NEMO 交叉对比（定性）、FireII 冻结相物理有效性确认 |
+| 2026-09-05 ~ 09-06 | Mutation++ 接入与 7 项库级核查；求解器启动三问题修复（libShapeFunctions / `--ldir` 模块目录 / ParMETIS 混 MPI）；Hornung V3 收敛；FireII/双锥冒烟通过；CUDA 垫片 + systemd 用户单元可靠启动配方（阶段记录：`doc/VALIDATION_MPP_INTERIM.md`） |
+| 2026-08-26 / 08-28 | 前置静态评估：求解能力综合评估（`COOLFluiD_高焓高超声速求解能力评估报告.md`）与 43 个算例逐一静态评估（`high_enthalpy_testcases_report.md`） |
+
+> **第五次修订（2026-09-12，完成度系统核查）主要更新**
+> 1. 新增 **§0 验证完成度总览**：对全部候选验证算例逐项核查（结果目录、日志、
+>    CFcase 配置、脚本均以实际文件为准），按"已确认完成对比验证 / 部分完成 /
+>    待运行（超算）/ 本机不可行"四档归类。
+> 2. 新增 **§8 待运行算例超算运行说明**：对 DoubleCone Run42、FireII 化学相、
+>    Hornung 细网格三个待运行算例给出物理条件、生产前配置修改清单、运行命令、
+>    对比方法与已知风险的完整说明；补充超算环境重建前提（§8.0）。
+> 3. 核实 `/home/tang/coolfluid_validation_runs/` 目录已清理，超算脚本与后处理
+>    工具以仓库内 `doc/validation/` 为准（`run_dcone_supercomputer.sh`、
+>    `postprocess_run42.py` 内嵌数字化实验参考值，不再依赖外部数据文件）。
+> 4. 论文锚点核实：Lani 2009 图 6.18/6.19（双锥 Run42）、Lani 2013 图 13/Table 1
+>    （双锥 Run42）、Lani 2013/2019 的 FIRE II 为 CR 模型（t=1634 s）结果，
+>    与本验证 1643 s CNEQ 配置条件不同，不作直接定量锚点。
+> 5. **本次复核新发现（已写入正文）**：① 原版 M++ 算例（Hornung NS
+>    CNEQ/TCNEQ/MeFiAlgo/Debug、IXV LTE M++）的混合物名在当前 Mutation++
+>    数据库中**已失效**（N2_neut/N2_TTv/air11 → 现库仅 n2_2/air_5/air_11/
+>    CO2_8/Mars_19/tacot-air_35）且缺 libShapeFunctions 模块，运行前需两处
+>    适配（§8.3/§8.4 及 high_enthalpy_testcases_report §4 修正）；② FireII
+>    `fire2.inter` 承载二阶开关（gradientFactor=1.0），不可整体注释（§8.2）；
+>    ③ FireII 化学相趋势日志实际位于 `plugins/NEQ/testcases/TCNEQ/FireII/logs/`
+>    （§5.2 路径已改）；④ 双锥冒烟结果目录已清理为空，冒烟证据以
+>    VALIDATION_MPP_INTERIM.md 记录为准。
 
 > **第三次修订（系统性修复工作）主要更新**
 > 1. **修复 Hornung V5 细网格算例的网格尺度错误**：V5 CFcase 对已是米制的
@@ -38,6 +71,48 @@
 >    推进已激活但化学刚性/隐式时间项待修）的真实状态。
 > 5. 删除不实引用：Lani 2009 博士论文验证的是 Double Cone（run 35/40/42）与
 >    HEG 空气圆柱，**不含** Hornung N2 圆柱，故不应用作 Hornung 脱体距离出处。
+
+## 0. 验证完成度总览（2026-09-12 核查）
+
+对全部候选验证算例逐项核查后的四档归类。**已确认完成对比验证**指：算例运行
+收敛（或达到稳定状态）且与参考数据（实验/正激波解/独立求解器）完成定量或
+定性对比并形成结论。
+
+### 0.1 已确认完成对比验证
+
+| 算例 | 验证内容与结论 | 详情 |
+|------|---------------|------|
+| **Hornung N2 圆柱 V3**（Euler CNEQ，800 单元） | 本轮唯一端到端完成的**定量**对比验证：① 38054 步收敛（残差 −3.00009）；② 驻点线近壁 T/p/密度比与 Mutation++ `mppshock` 平衡正激波解偏差 **+1.2% / −4.7% / −0.8%**（冻结侧密度比 −1.1%）；③ 激波脱体 δ/R=0.31（密度中点法）vs Hornung 1972 实验 0.22，落在冻结极限 0.30 与平衡极限 0.17 之间偏冻结侧（粗网格高估 39%，机理已明，见 §3） | §3 |
+| Mutation++ 库独立核查（库级，非流场算例） | checkmix / mppequil（常压+低气压）/ mppshock 冻结与平衡正激波 / VT 源项 / setState 语义 / ABI 兼容共 7 项通过，未触发"确认错误即停止"条款 | §2 |
+| SU2 NEMO 交叉对比（**定性**） | 两个独立求解器壁面压力分布形状一致，驻点压力与各自 Mutation++ 正激波参考同量级；SU2 残差停滞未充分收敛，仅可定性对比 | §4 |
+
+### 0.2 部分完成（物理有效性已确认，定量对比未完成）
+
+| 算例 | 已完成部分 | 未完成部分 |
+|------|-----------|-----------|
+| **FireII**（air_11 CNEQ，1643 s） | 冻结相 iter_1000 物理有效性确认（激波后密度↑12%、速度 10480→1538 m/s 递减、T 峰 40545 K，§5.2.1）；Sutton-Graves 参考与后处理工具已备（§5.3） | 化学相 run1/run2 均发散（11 组元化学刚性，§5.2）→ 与飞行数据（壁面热流）的定量对比**未完成**，待超算重试（§8.2） |
+| **ShockTube 1D**（air_5 NEQ） | RHS≡0 根因修复（1D `Euler1DNEQRhoivt` 缺 `setState()`），修复后 6/7 残差分量收敛至 −6，可稳定推进 | T 分量停滞（~3.1）；瞬态激波传播速度/剖面与解析解对比未通过（§6.1） |
+| **Hornung 细网格**（V5 系列） | 网格尺度 bug 发现并修复；V5b/V5c 两轮复跑完成 | V5b CFL=10 失稳作废；V5c 50000 步完成但解物理无效（Euler 细网格驻点奇异性，§3.5）→ δ/R 网格收敛性研究未完成，定量结论暂以 V3 粗网格为准，替代方案见 §8.3 |
+
+### 0.3 待运行验证（后续在超算上运行，详细说明见 §8）
+
+| 算例 | 优先级 | 状态与说明 | 资源预估 |
+|------|-------|-----------|---------|
+| **DoubleCone Run42**（N₂ TCNEQ） | **最高（论文主锚点）** | Lani 2009 图 6.18/6.19、Lani 2013 图 13/Table 1（CUBRC LENS I 实验壁面压力/热流）；M++ 适配完成，冒烟通过（2026-09-06，记录见 `doc/VALIDATION_MPP_INTERIM.md`；冒烟结果目录已清理）；CFcase 当前为冒烟配置（nbSteps=100），生产前需按 §8.1 修改 | ≥16 核（脚本按 32 核备），1–2 天 |
+| **FireII 化学相生产运行** | 高 | 本地三次发散后的超算重试；需按 §8.2 调整策略（交互式 CFL 替换为 Function 调度、停止条件、重启路径） | ≥32 核，1 天内 |
+| Hornung 细网格 δ/R 网格收敛（V6 方案） | 中 | V5 三次失败后的替代方案：改 NavierStokes2DNEQ 黏性壁面或 Euler+更低 CFL，检验 V3 的 δ/R 高估 39% 是否随网格加密收敛至实验 0.22（§8.3） | 12–32 核，小时级/轮次 |
+| （可选）Hornung TCNEQ M++（NS 双温度） | 低 | 未运行；2026-09-12 核查发现原版 CFcase **需先适配**（mixtureName `N2_TTv` 已失效→`n2_2`、Modules.Libs 首位补 `libShapeFunctions`，改法参照 `hornung_FVM_NS_CNEQ_EULER_n2_2.CFcase`）；为 ChemNonEqTTv 变量集提供与 V3 同类的驻点线验证，可作双锥 TCNEQ 的旁证 | 2–8 核，小时级 |
+| （可选）HEG 空气圆柱（论文直接锚定） | 低 | Lani 2009 论文的圆柱验证对象是 HEG 空气（air_5）圆柱而非 Hornung N₂ 圆柱；需从 Hornung 模板适配 air_5 + HEG 来流后运行 | 8–16 核 |
+
+### 0.4 本机构建/输入不可行（静态评估结论，不在本轮运行范围）
+
+依赖未编译旧库（Mutation 1.x / 2OLD / 2 / PLATO）：DoubleCone CRD 版、FireII
+Mutation2OLD 版、CateIXV、Nozzle1D、ArcJet 全系、IXV LTE Mutation2OLD 版；
+缺输入文件：Catalicity、PrabhuCylinder、ICP2Cat、EXPERT3D；缺外部混合物数据：
+SphereCO2 Mach38（air7_sahadeo_reordered）。完整清单与依据见
+`high_enthalpy_testcases_report.md` §3/§4（含 2026-09-12 修正：原版 M++ 算例
+混合物名失效 + 缺 libShapeFunctions，需两处适配后方可运行）。IXV LTE M++ 版
+未纳入本轮高焓非平衡验证主线（LTE 平衡气体），适配后留作后续扩展。
 
 ## 1. 目标
 
@@ -101,7 +176,7 @@ mppequil -P 101325 -T 5000 air_5   # 平衡组分
 | 通量分裂 | AUSM+ | |
 | 时间推进 | NewtonIterator + PETSc | GMRES, ASM 预处理 |
 | 收敛目标 | Norm = -3.0 | 38054 步达到 -3.00009 |
-| 运行时间 | 47 min 43 s（串行） | |
+| 运行时间 | 47 min 43 s（串行，含前后处理；收敛史记录求解段 WallTime 2231 s） | |
 
 ### 3.2 激波脱体距离验证（已修正冻结/平衡排序）
 
@@ -150,8 +225,9 @@ Hornung 干涉测量（测密度）口径一致，取为主估计 **δ/R≈0.31*
 - 冻结 T 峰（9070 K）低于 `mppshock` 冻结 RH 值（13914 K）约 35%，同样因为
   尖锐的冻结温度峰在厚激波/弛豫区内被空间平均（见 §3.3）。
 - **结论**：化学非平衡物理方向正确（解离、吸热、弛豫均出现），但 δ/R 的定量
-  收敛需要更细网格以分辨激波与弛豫区。V5 尝试 jesus0 网格（3680 单元），
-  154 步内未收敛（CFL=0.5 残差上升），需进一步调整 CFL 调度/初值后重跑。
+  收敛需要更细网格以分辨激波与弛豫区。细网格首次尝试（jesus0，3680 单元）
+  154 步内未收敛（CFL=0.5 残差上升）；后续 V5 系列改用 hornung_quad_1st
+  网格（14641 单元，见 §3.5），需进一步调整 CFL 调度/初值后重跑。
 
 ### 3.3 驻点线物理量验证
 
@@ -369,7 +445,7 @@ SU2 壁面驻点压力 57.3 kPa 比 `mppshock` 平衡正激波压力 47.6 kPa �
 | CFL 调度 | **两阶段方案**（见 §5.2） | 冻结相 0.01→0.1→0.5；化学相 0.01→0.05→0.1→0.3→1.0 |
 | 收敛目标 | MaxNumberSteps = 20000 | 原始 Norm=-7.0 过严 |
 | 运行核数 | 12 核 | ≤12 核限制内 |
-| 实测耗时 | 冻结相 11.5 min / 1159 步；化学相 ~0.57 s/step | 12 核并行 |
+| 实测耗时 | 冻结相 11.5 min / 1159 步（~0.6 s/步）；化学相 ~0.6 s/步（run1 1892 s/3090 步、run2 1942 s/3340 步） | 12 核并行 |
 
 ### 5.2 运行状态（第三次修订：两阶段方案）
 
@@ -398,9 +474,11 @@ SU2 壁面驻点压力 57.3 kPa 比 `mppshock` 平衡正激波压力 47.6 kPa �
 米制），CFL 0.01(<2000)→0.05(<5000)→0.1(<10000)→0.3(<15000)→min(1.0,×1.01)，
 20000 步，`air_11` + ChemNonEq1T 激活。
 
-- 弛豫趋势（`doc/validation/fireii_chem_trend.log` 监控）：T_max
-  1.02×10⁶（重启初值）→ 2.7×10⁵（~1100 步）→ 1.3×10⁵（~1500 步），
-  驻点壁面热流同步下降（1.83×10⁹ → 1.11×10⁹ W/m²）；
+- 弛豫趋势（`plugins/NEQ/testcases/TCNEQ/FireII/logs/fireii_chem_trend.log` 监控）：
+  T_max 自重启初值 1.02×10⁶ K 单调弛豫（会话期观测 ~1100 步 2.7×10⁵、
+  ~1500 步 1.3×10⁵；现存日志因监控重启仅存末样本——步 2677 时
+  T_max=1.27×10⁵ K，与上述序列相容），
+  驻点壁面热流同步下降（1.83×10⁹ → 1.11×10⁹ W/m²，末样本 1.11×10⁹）；
 - 判断：解正朝物理激波层弛豫，但重启场含过冲污染，最终热流数字需待
   运行完成后按 §5.3 与 Sutton-Graves / LAURA-FUN3D 量级对照，并说明
   "未完全收敛 + 粗网格（54 壁面单元）"的适用范围。
@@ -414,7 +492,7 @@ SU2 壁面驻点压力 57.3 kPa 比 `mppshock` 平衡正激波压力 47.6 kPa �
 - **run2 重启（运行中）**：从干净快照 `fire2-iter_3000.CFmesh`（T_max
   =1.63×10⁵ K，全有限）重启，**CFL 恒定 0.01**（不再跳变），12000 步，
   结果输出至 `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_MPP_RUN2/`；
-- run2 弛豫趋势（`fireii_chem2_trend.log`）：T_max 1.63×10⁵ → 9.9×10⁴ K
+- run2 弛豫趋势（`plugins/NEQ/testcases/TCNEQ/FireII/logs/fireii_chem2_trend.log`）：T_max 1.63×10⁵ → 9.9×10⁴ K
   （~400 步）→ 6.3×10⁴ K（~3100 步），但**残差单调上升**：2.46（步 1）→
   3.64（步 1098）→ 4.66（步 2127）→ 5.19（步 3131）→ **5.21（步 3339）→
   −DBL_MAX（步 3340）**；
@@ -488,8 +566,11 @@ SU2 壁面驻点压力 57.3 kPa 比 `mppshock` 平衡正激波压力 47.6 kPa �
   已在 `plugins/NEQ/Euler1DNEQRhoivt.cxx` 补上 `_library->setState()`
   （与 2D 实现对齐，属 COOLFluiD 侧修复，未改 Mutation++）。
 - **修复后运行**（`shocktube_fix5.log`，串行，2000 步）：
-  残差 7 分量中 6 个从 ~1 收敛到 **−5.9 ~ −7.8**（密度×5、动量×2、能量），
-  **T 分量停滞在 ~3.12**（无下降趋势）。RHS≡0 问题（KSP 0 步迭代）消失。
+  残差 7 分量（Rhoivt 集 = 密度×5 + 动量 + T）中 6 个收敛到 **−4.9 ~ −7.8**
+  （步 2000 终值：密度 −5.99/−6.01/−7.80/−6.00/−6.01，动量 −4.89），
+  **T 分量停滞在 ~3.12**（无下降趋势；2026-09-12 复核据
+  `results/RESULTS_ST_air5_MPP/convergence.plt.Default` 步 2000 核准）。
+  RHS≡0 问题（KSP 0 步迭代）消失。
 - **遗留问题**：T 方程残差停滞——可能为驱动段 5000 K 高温区化学源项刚性
   在该变量集上的表现，或时间导数项激活方式仍不完整；瞬态激波传播速度/
   剖面与解析解的定量对比尚未通过。**结论：从"完全无法推进"推进到"可稳定
@@ -541,65 +622,231 @@ bash run_coolfluid.sh <case_file> 12 28800
 | `MPP_DIRECTORY` | `/home/tang/packages/Mutationpp` | Mutation++ 根目录 |
 | `MPP_DATA_DIRECTORY` | `/home/tang/packages/Mutationpp/data` | 混合物数据目录 |
 
-## 8. 超算运行脚本（高成本算例）
+## 8. 待运行算例超算运行说明（2026-09-12 修订）
 
-### 8.1 DoubleCone Run42（建议 ≥16 核，1-2 天）
+> 本机工作目录 `/home/tang/coolfluid_validation_runs/` 已清理；超算提交脚本与
+> 后处理工具以仓库内 `doc/validation/` 为准（`run_dcone_supercomputer.sh`、
+> `postprocess_run42.py`、`postprocess_final.py`、`revalidate_hornung.py`、
+> `run_coolfluid.sh` 等）。以下路径均以仓库根目录为 `CF_ROOT`，在超算上按
+> 实际部署位置替换。
+
+### 8.0 超算环境重建前提（三个算例共用）
+
+1. **代码树同步与编译**：将 COOLFluiD 源码树（含 `plugins/NEQ/testcases/` 下的
+   网格/CFcase 与 `doc/validation/` 脚本）同步至超算，按本机相同的 CMake 配置
+   重新编译（依赖：MPICH、PETSc、Boost 1.85、MPICH 版 ParMETIS 4.0.3、
+   Mutation++）。
+2. **Mutation++ 版本锁定**：必须使用与本机验证一致的版本
+   （v1.0.5-92-gbb054e5）。M++ 重新安装/升级后 **适配层 libMutationppI 必须重编**
+   （本机已验证 ABI 兼容随 M++ 库重建而失效）。
+3. **ParMETIS 与 MPI 一致**：ParMETIS 必须与所用 MPI 匹配（本机曾因系统
+   OpenMPI 版 ParMETIS 混链 MPICH 程序而 PMPI_Allreduce abort）。用超算默认
+   MPI 时需重编 ParMETIS 或改用超算自带的匹配版本。
+4. **CUDA 垫片不需要**：`libfakecuda.so` 是本机 GPU 驱动 flaky 的权宜之计；
+   超算上用 CPU 构建或 GPU 正常时**去掉 LD_PRELOAD**。
+5. **启动命令模板**（`--ldir` 必须指向 `build/optim/dso`；它是向量选项，放最后）：
+   ```bash
+   cd ${CF_ROOT}
+   mpirun -np <N> ./build/optim/apps/Solver/coolfluid-solver \
+     --scase <case.CFcase> --bdir ${CF_ROOT} --ldir ${CF_ROOT}/build/optim/dso
+   ```
+6. **结果归档约定**：各算例结果写入 `plugins/NEQ/testcases/TCNEQ/<算例>/results/`
+   下的新目录（避免覆盖本机已有结果）；运行日志同步保存。
+
+### 8.1 DoubleCone Run42（最高优先级：论文主锚点）
+
+**验证目标**：CUBRC LENS I 风洞双锥实验 Run 42（N₂，2 组元，双温度）。
+壁面压力/热流与实验对比——COOLFluiD 论文的直接验证对象：Lani 2009 博士论文
+图 6.18/6.19（PDF 第 183 页）、Lani 2013 AIAA 图 13 与 Table 1（NATO RTO
+AVT-136 工作组对比，COOLFluiD RDS 结果与实验"excellent agreement"）。
+
+**算例与网格**：
+- CFcase：`plugins/NEQ/testcases/TCNEQ/DoubleCone/Run42_N2/DConeN2_42_FVM_M++.CFcase`
+  （NavierStokes2DNEQ + MutationppI `ChemNonEqTTv`，混合物 n2_2，2D 轴对称，
+  FVM + AUSMPlusMS2D 二阶 + Venktn2D）
+- 网格：`DConeN2_B.plt` 经 Tecplot2CFmesh 在线转换（~5 万三角形单元），已验证可读
+
+**来流与壁面条件**（已写入 CFcase `refValues`/`SkinFriction` 配置，勿改）：
+
+| 参数 | 值 |
+|------|-----|
+| ρ∞ (N₂) | 1.468×10⁻³ kg/m³ |
+| u∞ | 3849.3 m/s（约 M∞=11.5） |
+| T∞ / Tv∞ | 268.7 K / **3160 K**（来流本身热非平衡） |
+| p∞ | 113.085 Pa |
+| TWall | 294.7 K（等温非催化） |
+
+**生产前配置修改清单（重要）**：
+1. **停止条件**：当前 `MaxNumberSteps.nbSteps = 100` 为冒烟配置（继承自原版，
+   原版靠交互式文件手动续跑）→ 改为 `nbSteps = 30000`（或注释掉该两行、启用
+   `StopCondition = Norm` / `valueNorm = -7.0`；原版头部注释显示参考解收敛
+   残差约 −5.84，可达）。
+2. **CFL**：自动调度已内置
+   `if(i<200,0.1,if(i<1000,0.5,if(i<4200,1.,min(30.,cfl*1.02^2))))`，无人值守
+   可用。`DConeFVM.inter`（每 10 步读取）会将 `limitIter` 改写为 5000（其交互
+   CFL 值因 ComputeCFL=Function 而不生效）。
+3. **限制器风险注记**：M++ 变体将 `limitIter` 从原版 3500 改为 1×10⁶（限制器
+   常开），靠 inter 文件改回 5000。Hornung 的教训是 Venkat 限制器常开在大 CFL
+   下可能发散——**若生产运行出现 Venkat 发散，显式恢复 `limitIter = 3500`**。
+4. **MeFiAlgo 保持禁用**（CFcase 中已注释）：三角形网格上移动节点触发
+   `CorrectedDerivative2D` 断言（邻居为四边形）崩溃。
+5. **初始化/钳位已适配**（勿回退）：Run42 一致来流 + 人工边界层（原文件用
+   Hornung 模板值 −5590/1833 会导致首迭代非物理态）；`MinT=200`/
+   `MinRhoi=1e-10` 钳位；`FilterState T,Tv≥200K`。
+
+**运行命令**（脚本 `doc/validation/run_dcone_supercomputer.sh`，PBS/SLURM 双
+头已备；建议 32 核 48 h）：
 
 ```bash
-#!/bin/bash
-# PBS/SLURM 脚本 — DoubleCone Run42 N2 TCNEQ (Mutation++)
-# 提交：qsub run_dcone_pbs.sh  或  sbatch run_dcone_slurm.sh
-
-#PBS -N DCone_Run42
-#PBS -l nodes=4:ppn=8          # 32 核
-#PBS -l walltime=48:00:00
-#PBS -q normal
-
-# 加载环境
-source ~/.bashrc
-
-CF_ROOT=/home/tang/packages/COOLFluiD
-MPICH_DIR=/home/tang/packages/mpichInstall
-MPP_DIR=/home/tang/packages/Mutationpp
-export MPP_DIRECTORY=${MPP_DIR}
-export MPP_DATA_DIRECTORY=${MPP_DIR}/data
-export LD_LIBRARY_PATH=${CF_ROOT}/install/lib:${CF_ROOT}/build/optim/dso:${MPP_DIR}/install/lib:${MPICH_DIR}/lib:/home/tang/packages/boost_1_85_0/install/lib:/home/tang/packages/petsc/arch-linux-c-opt/lib:/home/tang/packages/ParMETIS/install-mpich/lib
-
-cd ${CF_ROOT}
-${MPICH_DIR}/bin/mpirun -np 32 ${CF_ROOT}/build/optim/apps/Solver/coolfluid-solver \
-  --scase plugins/NEQ/testcases/TCNEQ/DoubleCone/Run42_N2/DConeN2_42_FVM_M++.CFcase \
-  --bdir ${CF_ROOT} --ldir ${CF_ROOT}/build/optim/dso
+# 提交前：确保 tee 目标目录存在（脚本日志与算例结果目录不同位）
+mkdir -p ${CF_ROOT}/RESULTS_Dcone_TCNEQ_MPP
+qsub run_dcone_supercomputer.sh    # 或 sbatch run_dcone_supercomputer.sh
 ```
 
-### 8.2 FireII 全量（若 12 核不够，建议 ≥32 核）
+**输出与对比方法**：
+- 壁面数据：DataProcessing2 `NavierStokesSkinFrictionHeatFluxCCNEQ` →
+  `RESULTS_Dcone_TCNEQ_MPP/DConeFVM_heat.plt`（Side0，含压力/热流分布）；
+  全场与重启文件按 `Tecplot.SaveRate=1` / `CFmesh.SaveRate=500` 输出。
+- 后处理对比：`python3 doc/validation/postprocess_run42.py <RESULTS_DIR>`
+  （脚本**内嵌数字化实验参考值**，原外部 `exp_run42_digitized.dat` 已随
+  `/home/tang/coolfluid_validation_runs/` 清理删除，脚本不再依赖）。
+- **定量参考值**（Lani 2009 图 6.18/6.19）：25° 锥平台压力 ~9–10 kPa；
+  锥交接点/再附压力峰 ~47 kPa @ x≈0.09 m；驻点热流 ~6×10⁵ W/m²；
+  再附热流峰 ~5–6×10⁵ W/m²。
+- 判据：壁面压力/热流曲线与实验点（及论文中 COOLFluiD RDS 结果）的偏差、
+  分离泡长度与 Type IV 干扰结构位置。
 
-```bash
-#!/bin/bash
-#SBATCH --job-name=FireII
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=16    # 32 核
-#SBATCH --time=24:00:00
-#SBATCH --partition=normal
+**已知风险**：
+- Tv∞=3160 K 来流强热不平衡，起步阶段 T/Tv 残差处于弛豫平台属预期物理
+  （冒烟已验证），需 CFL 爬升后消解；不要因前期平台误判发散。
+- 串行 ~20–25 s/步；32 核并行效率未实测（PETSc PCASM），若扩展性差可降至
+  16 核加长 walltime。
 
-source ~/.bashrc
-# ... (同上环境设置)
-srun -n 32 ${CF_ROOT}/build/optim/apps/Solver/coolfluid-solver \
-  --scase plugins/NEQ/testcases/TCNEQ/FireII/fire2_1643s_CNEQ_Mpp.CFcase \
-  --bdir ${CF_ROOT} --ldir ${CF_ROOT}/build/optim/dso
-```
+### 8.2 FireII 化学相生产运行（高优先级）
+
+**验证目标**：FIRE II 再入飞行试验 t=1643 s 弹道点的驻点壁面热流与激波层
+结构。**论文锚点说明**：Lani 2013/2019 中的 FIRE II 结果是碰撞-辐射（CR）模型
+（t=1634 s，V∞=11360 m/s）的电子能级布居/辐射对比，与本验证的 1643 s CNEQ
+配置条件不同，**不作直接定量锚点**；以飞行实验文献为准（Sutton-Graves 关联式、
+LAURA/FUN3D 文献值）。
+
+**算例与网格**：`plugins/NEQ/testcases/TCNEQ/FireII/fire2_1643s_CNEQ_Mpp.CFcase`
+（NavierStokes2DNEQ + MutationppI `ChemNonEq1T`，air_11 [e⁻,N⁺,O⁺,NO⁺,N₂⁺,O₂⁺,N,O,NO,N₂,O₂]，
+2D 轴对称）。`fire2_small80x.neu` 经 ScalingFactor=1e6 转换（球头 R_n=0.8433 m
+已圆拟合核实，**勿改**）。条件：V∞=10480 m/s，T∞=276 K，ρ∞=7.8×10⁻⁴ kg/m³，
+TWall=640 K 等温非催化。
+
+**生产前配置修改清单**：
+1. **停止条件**：`StopCondition = Norm` / `valueNorm = -7.0` 过严（原始配置）→
+   改 `MaxNumberSteps.nbSteps = 20000`。
+2. **CFL 无人值守化（2026-09-12 复核修正）**：原算例靠 `fire2.inter`
+   （readRate=10）交互调节。**注意：inter 文件除交互 CFL 外还承载二阶开关
+   `gradientFactor=1.0` 与 `limitIter=6×10⁶`（CFcase 本体为
+   `gradientFactor=0.` 一阶）——不可整体注释 InteractiveParamReader，否则
+   算例静默退回一阶**。正确做法：保留 inter 文件原样，在 CFcase 中显式启用
+   `ComputeCFL = Function` 并给出调度（Function 优先级高于 inter 的交互值，
+   交互值自动失效）：`if(i<2000,0.01,if(i<5000,0.05,if(i<10000,0.1,if(i<15000,0.3,min(1.0,cfl*1.01)))))`。
+   （绝热壁启动 `NbIterAdiabatic=1000` 与热流后处理 `DataProcessing3` 已内置于
+   CFcase，不依赖 inter 文件。）
+3. **重启方式（若从冻结相 iter_1000 继续）**：`CFmeshFileReader.FileName` 指向
+   `RESULT_FIREII_FROZEN/fire2-iter_1000.CFmesh`；**路径必须写成 WorkingDir
+   相对路径**（CFmeshFileReader 的相对路径解析到 WorkingDir 而非 cwd，本机已
+   踩坑）；重启网格坐标已为米制，**删除 ScalingFactor 行**。
+4. `libShapeFunctions` 首位等模块清单已适配，勿动。
+
+**失败历史与候选策略**（本机 12 核三次尝试均发散，详见 §5.2）：
+
+| 尝试 | 配置 | 结果 |
+|------|------|------|
+| 单阶段 ×2 | 人工边界层初值直接开化学，CFL 1.0 / 0.1→1.0 | 767 步 / 532 步发散（质量分数断言） |
+| run1 | 冻结相 iter_1000 重启，CFL 0.01→0.05 跳变 | 3090 步 NaN |
+| run2 | 冻结相 iter_3000 干净快照重启，CFL=0.01 恒定 | 3340 步 NaN（残差自步 1 起单调升） |
+
+- **策略 A（推荐先试）**：从干净快照重启——`RESULT_FIREII_MPP_RUN/fire2-iter_3000.CFmesh`
+  （run1 输出、run2 当时的重启源，T_max=1.63×10⁵ K 全有限；**注意
+  `RESULT_FIREII_MPP_RUN2/` 下同名文件是 run2 自身步 3000 的场，已处残差
+  上升段，勿用**，2026-09-12 复核确认两文件内容不同），CFL **0.001–0.005**
+  起步、爬升周期放大 5–10 倍，30000–50000 步；本机 run2 的单调残差增长表明
+  化学源项刚性是主因，超算上更大核数不解决刚性，**但可验证"低 CFL + 足够
+  步数"能否走出弛豫**。
+- **策略 B**：完整单阶段重跑（原版配置 + Function CFL 从 0.01 起步 +
+  `NbIterAdiabatic=800` 绝热壁启动），检验从人工边界层初值直接收敛是否只在
+  小核数/本机环境失败。
+- **策略 C（降级结论）**：若化学相仍发散，以冻结相 iter_1000（物理有效）+
+  `mppshock` 冻结/平衡正激波解 + Sutton-Graves 量级对照收尾，明确记录
+  "11 组元化学刚性在本开源树隐式框架下的收敛限制"（对评估报告为负结果，
+  但仍是有价值的验证结论）。
+
+**对比方法**（`doc/validation/postprocess_final.py` fireii_chem 分支已备）：
+- 驻点热流 q_stag vs Sutton-Graves 579 W/cm²（文献 R_n=0.9347 m）/ 610 W/cm²
+  （网格 R_n=0.8433 m）；文献量级 LAURA/FUN3D 全催化壁对流 ~6 MW/m² +
+  辐射 ~1 MW/m²（非催化壁更低）；
+- 激波脱体 δ/R_n、激波层峰值温度、N₂/NO/N/O 组分剖面（化学激活的定性证据）。
+
+**资源预估**：化学相 12 核实测 ~0.6 s/步；32 核估 ~0.2–0.3 s/步，
+30000 步约 2–4 h/轮次（建议留 24 h walltime 做多轮策略尝试）。
+
+### 8.3 Hornung 细网格 δ/R 网格收敛（V6 方案，中优先级）
+
+**验证目标**：V3 粗网格 δ/R=0.31 高估实验 0.22 约 39%——需要网格收敛性研究
+判定该偏差是否随加密收敛（粗网格数值粘性所致），还是模型层面问题。
+
+**失败历史**（§3.5，均已作废）：V5 缩放 bug（米制网格再除 1000）→ V5b
+CFL=10 失稳 → V5c CFL≤1.0 完成 50000 步但解物理无效（激波后 ρ/p 单调递减
+至 0、壁面 v 振荡 ±3000 m/s、T 奇偶失耦——Euler 无粘方程细网格壁面驻点
+奇异性）。
+
+**候选方案**：
+- **方案 A（推荐）**：改用黏性 NS。以 `hornung_FVM_NS_CNEQ_M++.CFcase`
+  （NoSlipWallIsothermal，TWall=1000 K）为模板，**先做两处适配**（mixtureName
+  `N2_neut` 已失效→`n2_2`；Modules.Libs 首位补 `libShapeFunctions`——2026-09-12
+  核查发现原版 M++ 算例普遍存在此问题，改法参照
+  `hornung_FVM_NS_CNEQ_EULER_n2_2.CFcase`）。网格两级：先 `jesus0_quad.neu`
+  （3813 节点/3680 单元，Gambit 在线转换、ScalingFactor=1000 为 mm→m 正确
+  缩放），再加密至 14641 单元——源网格 `hornung_quad_visc.neu`（14884 节点，
+  文件名 visc 表明该细网格本为黏性计算设计；对应 `hornung_quad_1st.CFmesh`
+  **已为米制，禁加 ScalingFactor**）。交互参数模板 `hornung_FVM_visc.inter`
+  已提供（gradientFactor=1 二阶、limitIter=3500、CFL 交互值 100）。黏性壁面
+  消除驻点奇异性（FireII 冻结相同框架物理有效的旁证）。
+- **方案 B**：保持 Euler 但 CFL 全程 ≤0.1 + 步数放大到 10⁵ 量级（成本高，
+  兜底选项）。
+
+**对比方法**：`revalidate_hornung.py` 可直接复用（全场提取驻点线 + 4 准则
+激波定位 + mppshock 冻结/平衡对照）；输出 δ/R–网格尺寸收敛曲线，外推至
+无穷网格 vs 实验 0.22。
+
+**资源预估**：V5c 实测 12 核 1.5 h/50000 步（14641 单元）；方案 A 两级网格
+共 2 轮，1 天内可完成（可与双锥/FireII 同批提交）。
+
+### 8.4 可选扩展算例
+
+1. **Hornung TCNEQ M++（NS 双温度）**：`hornung_FVM_NS_TCNEQ_M++.CFcase`
+   （未运行过；**需先适配**：mixtureName `N2_TTv` 已失效→`n2_2`、
+   Modules.Libs 首位补 `libShapeFunctions`，改法参照 Euler 版）。
+   价值：ChemNonEqTTv 变量集（双锥同款）在 NS 框架下的
+   独立验证，为双锥 Run42 结果提供旁证；串行数小时量级，2–8 核即可。
+2. **HEG 空气圆柱（论文直接锚定）**：Lani 2009 博士论文的圆柱验证算例为
+   HEG 条件空气（air_5）圆柱，与本轮 Hornung N₂ 圆柱（锚定 Hornung 1972
+   实验）互补。需从 Hornung 模板适配：mixtureName → air_5、来流条件按论文
+   HEG 工况（Section/Chapter 中的圆柱验证节）设置、网格复用 coarse/jesus0。
+   完成后可与论文中 COOLFluiD 原始结果对比（论文自带该算例结果图）。
 
 ## 9. 验证状态总览
 
-| 算例 | 状态 | 结果/证据 | 文件位置 |
-|------|------|-----------|----------|
-| Mutation++ 独立核查 | [OK] 通过 | checkmix/mppequil/mppshock 冻结+平衡正激波解合理 | — |
-| Hornung 圆柱 V3 | [OK] 收敛+物理验证 | 38054 步收敛；**近壁 T +1.2%、p −4.7%、密度比 −0.8%（对 mppshock 平衡解）**；δ/R=0.31（密度中点，粗网格偏冻结侧，实验 0.22）| `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/` |
-| SU2 交叉对比 | [WARN] 定性一致，SU2 未收敛 | 壁面压力形状一致；SU2 残差停滞于 ~1e-5；驻点 57.3 kPa vs mppshock 平衡 47.6 kPa（+20%）| `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/compare_*.png` |
-| FireII 冻结相 | [OK] 物理有效 | iter_1000：密度激波后增加 12%，速度递减至壁面，T 峰 40545 K；9 个过冲单元（0.21%）；冻结相在 CFL=0.5 步 1159 发散 | `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_FROZEN/` |
-| FireII 化学相 run2 | [FAIL] 发散 | CFL=0.01 恒定，残差从 2.46 单调上升至 5.21（步 3339）→ NaN（步 3340）；11 组元化学刚性根本限制 | `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_MPP_RUN2/` |
-| ShockTube 1D | [WARN] RHS≡0 已修复，T 分量待通 | 修复 setState 后 6/7 残差收敛至 −6，T 停滞 ~3.1；瞬态激波对比未通过 | `plugins/NEQ/testcases/TCNEQ/ShockTube/` |
-| DoubleCone Run42 | [WAIT] 待超算 | 需 ≥16 核，1-2 天 | 脚本已备 |
-| Hornung V5（细网格）| [FAIL] V5c 解物理无效 | V3 收敛（δ/R=0.31）；V5 缩放 bug 作废；V5b CFL=10 失稳作废；V5c 50000 步完成但 rho→0/p→0 解物理无效（Euler 细网格驻点奇异性）；**以 V3 为准** | `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/` `.../RESULTS_CNEQ_EULER_N22_V5C/` |
+（分类归属见 §0；"待超算"算例的详细运行说明见 §8）
+
+| 算例 | 分类 | 状态 | 结果/证据 | 文件位置 |
+|------|------|------|-----------|----------|
+| Mutation++ 独立核查 | 已完成 | [OK] 通过 | checkmix/mppequil/mppshock 冻结+平衡正激波解合理 | — |
+| Hornung 圆柱 V3 | 已完成 | [OK] 收敛+物理验证 | 38054 步收敛；**近壁 T +1.2%、p −4.7%、密度比 −0.8%（对 mppshock 平衡解）**；δ/R=0.31（密度中点，粗网格偏冻结侧，实验 0.22）| `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/` |
+| SU2 交叉对比 | 已完成（定性） | [WARN] 定性一致，SU2 未收敛 | 壁面压力形状一致；SU2 残差停滞于 ~1e-5；驻点 57.3 kPa vs mppshock 平衡 47.6 kPa（+20%）| `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/compare_*.png` |
+| FireII 冻结相 | 部分完成 | [OK] 物理有效 | iter_1000：密度激波后增加 12%，速度递减至壁面，T 峰 40545 K；9 个过冲单元（0.21%）；冻结相在 CFL=0.5 步 1159 发散 | `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_FROZEN/` |
+| FireII 化学相 run2 | 部分完成 | [FAIL] 发散→待超算重试 | CFL=0.01 恒定，残差从 2.46 单调上升至 5.21（步 3339）→ NaN（步 3340）；11 组元化学刚性根本限制；**重试策略 A/B/C 见 §8.2** | `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_MPP_RUN2/` |
+| ShockTube 1D | 部分完成 | [WARN] RHS≡0 已修复，T 分量待通 | 修复 setState 后 6/7 残差收敛至 −6，T 停滞 ~3.1；瞬态激波对比未通过 | `plugins/NEQ/testcases/TCNEQ/ShockTube/` |
+| DoubleCone Run42 | 待运行 | [WAIT] 待超算 | M++ 适配完成、冒烟通过（2026-09-06，记录见 `doc/VALIDATION_MPP_INTERIM.md`；结果目录已清理）；CFcase 为冒烟配置（nbSteps=100）；**生产配置修改清单见 §8.1**；需 ≥16 核，1-2 天 | `plugins/NEQ/testcases/TCNEQ/DoubleCone/Run42_N2/` |
+| Hornung V5（细网格）| 部分完成 | [FAIL] V5c 解物理无效→V6 方案待运行 | V3 收敛（δ/R=0.31）；V5 缩放 bug 作废；V5b CFL=10 失稳作废；V5c 50000 步完成但 rho→0/p→0 解物理无效（Euler 细网格驻点奇异性）；**以 V3 为准；替代方案见 §8.3** | `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/` `.../RESULTS_CNEQ_EULER_N22_V5C/` |
+| Hornung TCNEQ M++（可选）| 待运行 | [WAIT] 未运行 | 需先适配（mixtureName 失效、缺 libShapeFunctions，§8.4）；为 ChemNonEqTTv 提供独立验证 | `plugins/NEQ/testcases/TCNEQ/Hornung/hornung_FVM_NS_TCNEQ_M++.CFcase` |
+| HEG 空气圆柱（可选）| 待运行 | [WAIT] 未适配 | 论文直接锚定算例；需 air_5 + HEG 来流适配（§8.4） | — |
 
 ## 10. 结论（复核修订）
 
@@ -647,7 +894,17 @@ srun -n 32 ${CF_ROOT}/build/optim/apps/Solver/coolfluid-solver \
    **新增诊断**：V5c 完成但物理无效（Euler 细网格驻点奇异性）；FireII run2
    发散（化学刚性根本限制）。两个失败均非代码 bug，而是物理/数值方法限制。
 
-8. **超算需求**：DoubleCone Run42 需 ≥16 核运行 1-2 天，超算脚本已备（§8）。
+8. **超算需求**：DoubleCone Run42 需 ≥16 核运行 1-2 天（最高优先级，论文主
+   锚点）；FireII 化学相 ≥32 核；Hornung 细网格 12-32 核。超算环境重建前提
+   与各算例生产配置修改清单见 §8。
+
+9. **完成度总结（2026-09-12）**：候选验证算例中，**已确认完成对比验证 3 项**
+   （Hornung V3 定量、Mutation++ 库级核查、SU2 定性交叉对比）；**部分完成
+   3 项**（FireII 冻结相物理有效但化学相发散、ShockTube 推进但 T 分量停滞、
+   Hornung 细网格三连败）；**待超算运行 3 项**（双锥 Run42、FireII 化学相、
+   细网格 V6）+ 可选 2 项（TCNEQ 圆柱、HEG 空气圆柱）。高焓非平衡验证的
+   定量闭环（双锥壁面压力/热流 vs 实验、FireII 壁面热流 vs 飞行数据、
+   δ/R 网格收敛）全部依赖超算生产运行，运行说明已备（§8）。
 
 ## 附录：验证脚本
 
@@ -665,6 +922,7 @@ srun -n 32 ${CF_ROOT}/build/optim/apps/Solver/coolfluid-solver \
 | `compare_coolfluid_su2.py` | `doc/validation/` | COOLFluiD vs SU2 壁面压力对比 |
 | `parse_coolfluid_plt.py` | `doc/validation/` | Tecplot .plt 文件解析器 |
 | `run_coolfluid.sh` | `doc/validation/` | COOLFluiD 运行环境封装脚本 |
+| `run_dcone_supercomputer.sh` | `doc/validation/` | 双锥 Run42 超算提交脚本（PBS/SLURM 双头，§8.1） |
 | `fakecuda.c` / `libfakecuda.so` | `doc/validation/` | CUDA 运行时垫片 |
 
 ### 附录 B：算例日志与结果归档位置
