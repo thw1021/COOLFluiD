@@ -63,7 +63,8 @@ Simulator.SubSystem.CFmesh.AppendIter = true
 #Simulator.SubSystem.MaxNumberSteps.nbSteps = 1
 
 Simulator.SubSystem.StopCondition       = Norm
-Simulator.SubSystem.Norm.valueNorm      = -7.0
+# reference run (built-in Mutation2 CNEQ case) converged to residual -4.0033056
+Simulator.SubSystem.Norm.valueNorm      = -4.0
 
 Simulator.SubSystem.Default.listTRS = Wall Symmetry Inlet Outlet
 

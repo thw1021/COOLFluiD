@@ -60,11 +60,12 @@ Simulator.SubSystem.CFmesh.FileName  = DConeFVM.CFmesh
 Simulator.SubSystem.CFmesh.AppendIter = false
 Simulator.SubSystem.CFmesh.SaveRate = 500
 
-Simulator.SubSystem.StopCondition       = MaxNumberSteps
+# reference run (Mutation2OLD, same mesh/physics) converged to residual -5.8422347;
+# relax to -5.0 if queue walltime is tight (wall P field converged by then)
+Simulator.SubSystem.StopCondition       = Norm
+Simulator.SubSystem.Norm.valueNorm      = -5.5
 Simulator.SubSystem.MaxNumberSteps.nbSteps = 100
 
-#Simulator.SubSystem.StopCondition       = Norm
-#Simulator.SubSystem.Norm.valueNorm      = -7.0
 
 Simulator.SubSystem.Default.listTRS = Side0 Side3 Side2 Side1
 

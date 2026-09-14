@@ -1,0 +1,27 @@
+# Digitized experimental data from Lani 2009 thesis Fig 6.18a (surface pressure)
+# and Fig 6.19a (surface heat flux), CUBRC LENS I Run 42 double cone.
+# Read from 300-dpi render of PDF page 183; accuracy ~±0.002 m in x, ~±5-8% in value.
+# Columns: x[m]  Pw[Pa]  Q[W/m2]
+0.040  4700  1.35e5
+0.044  4800  1.28e5
+0.047  4700  1.15e5
+0.052  8200  0.30e5
+0.056  9500  0.15e5
+0.060  9600  0.08e5
+0.065  9800  0.05e5
+0.070  9800  0.05e5
+0.075  10000 0.08e5
+0.080  10600 0.10e5
+0.085  10400 0.12e5
+0.090  10400 0.15e5
+0.095  12000 0.55e5
+0.100  23000 0.75e5
+0.105  40500 2.30e5
+0.108  40500 2.30e5
+0.110  19300 5.10e5
+0.115  12500 1.55e5
+0.120  17000 1.75e5
+0.128  17200 1.50e5
+0.133  16800 1.45e5
+0.140  16200 1.40e5
+0.148  16000 1.10e5
