@@ -125,7 +125,7 @@ CFcase (.CFcase)                          运行时选择
 
 ### 2.6 辐射（完全自实现，零 M++ 依赖）
 
-`plugins/RadiativeTransfer/`（插件共 61 个源文件）：HSNB 高分辨率谱带模型、ESA PARADE 外部库适配层（`plugins/PARADE/ParadeLibrary.hh:35`，与 M++ 适配层同构但对接 PARADE）、Grey 灰气体、ArcJet 谱库；求解器含蒙特卡洛射线追踪（`RadiativeTransferMonteCarlo`、`PhotonTrace`）、离散坐标法（`FiniteVolumeDOM`）、太阳辐射（`FiniteVolumeSolar`）。流场-辐射耦合经 `ChemNEQST` 的 `_hasRadiationCoupling`/`RadRelaxationFactor` 与 `getSourceTermVT` 的 `omegaRad` 通道。RadiativeTransfer 自身代码不直连 M++，但辐射算例通常以 `Mutationpp` 为物性库提供流场状态（如 `huygens_DLR_PARADE_MC.CFcase:38-40`，混合物 `titan19`）。
+`plugins/RadiativeTransfer/`（插件共 61 个源文件）：HSNB 高分辨率谱带模型、ESA PARADE 外部库适配层（`plugins/PARADE/ParadeLibrary.hh:35`，与 M++ 适配层同构但对接 PARADE）、Grey 灰气体、ArcJet 谱库；求解器含蒙特卡洛射线追踪（`RadiativeTransferMonteCarlo`、`PhotonTrace`）、离散坐标法（`FiniteVolumeDOM`）、太阳辐射（`FiniteVolumeSolar`）。流场-辐射耦合经 `ChemNEQST` 的 `_hasRadiationCoupling`/`RadRelaxationFactor` 与 `getSourceTermVT` 的 `omegaRad` 通道。RadiativeTransfer 自身代码不直连 M++，但辐射算例通常以 `Mutationpp` 为物性库提供流场状态（如 `huygens_DLR_PARADE_MC.CFcase:38-40`，混合物 `titan19`——该名已不在现库，见附录 B）。
 
 ### 2.7 ICP / ArcJet 电磁物理（自实现，仅电导率取库）
 
@@ -236,7 +236,7 @@ CFcase (.CFcase)                          运行时选择
 
 ### 5.2 化学源项解析雅可比 `jacobianRho`
 
-M++ 提供 ∂ω̇i/∂ρj 解析雅可比（`src/kinetics/Kinetics.h:195`，JacobianManager 支持）。适配层 `getMassProductionTerm` 的雅可比分支为 TODO（`MutationLibrarypp.cxx:642`），当前 M++ 算例隐式求解依赖 PETSc 数值雅可比（`NumJacob`）。**影响有实测证据**：FireII 11 组元电离空气化学相三次发散（`VALIDATION_REPORT.md` §5.2/§8.2），诊断结论为化学刚性——解析雅可比是改善该收敛性的候选路径之一。旧 Mutation2OLD 路径曾有解析雅可比实现（能力评估报告 §2.1），说明 COOLFluiD 侧接口是现成的，缺的只是适配层实现。
+M++ 提供 ∂ω̇i/∂ρj 解析雅可比（`src/kinetics/Kinetics.h:195`，JacobianManager 支持）。适配层 `getMassProductionTerm` 的雅可比分支为 TODO（`MutationLibrarypp.cxx:642`），当前 M++ 算例隐式求解依赖 PETSc 数值雅可比（`NumJacob`）。**影响有实测证据**：FireII 11 组元电离空气化学相四次运行均发散（单阶段两轮 + 重启 run1/run2，`VALIDATION_REPORT.md` §5.2/§8.2），诊断结论为化学刚性——解析雅可比是改善该收敛性的候选路径之一。旧 Mutation2OLD 路径曾有解析雅可比实现（能力评估报告 §2.1），说明 COOLFluiD 侧接口是现成的，缺的只是适配层实现。
 
 ### 5.3 多组元扩散矩阵与热导率分量拆分
 
@@ -288,7 +288,7 @@ M++ 提供 ∂ω̇i/∂ρj 解析雅可比（`src/kinetics/Kinetics.h:195`，Jac
 | 平衡组分（LTE）| **M++** | Equil 状态模型内部多相平衡求解器 |
 | 无黏/黏性通量格式 | COOLFluiD | AUSM+MS 族、Roe/RoeVinokur-NEQ、RDS-CRD |
 | 隐式时间推进/线性求解 | COOLFluiD | Newton+PETSc、LUSGS、BDF2/CN |
-| 化学源项解析雅可比 | （双方均未闭环） | 接口在 COOLFluiD，M++ 有 `jacobianRho`，适配层 TODO（§5.2）|
+| 化学源项解析雅可比 | **M++ 路径未闭环** | 接口在 COOLFluiD，M++ 有 `jacobianRho`，适配层 TODO（§5.2）；旧 Mutation2OLD 路径曾实现 |
 | 壁面催化（Γ 系数模型）| COOLFluiD | CatalycityModel + Cat 壁面 BC 族 |
 | 壁面催化（有限速率/表面平衡）、烧蚀、升华、吹出 | （未实现）| M++ GSI 模块具备，未接入（§5.1）|
 | 辐射物性与传输 | COOLFluiD（+PARADE 外部库）| HSNB/MC/DOM；与 M++ 无关 |
@@ -361,10 +361,10 @@ bash -ic 'make install'
 |--------|------|------|
 | M++ 库级独立核查（7 项） | checkmix / mppequil（常压+低压）/ mppshock 冻结+平衡正激波 / setState 语义 / VT 源项 / ABI 全部通过 | VALIDATION_REPORT §2 |
 | Hornung N₂ 圆柱 V3（Euler CNEQ，n2_2） | 38054 步收敛；近壁 T +1.2% / p −4.7% / 密度比 −0.8% vs mppshock 平衡解；δ/R=0.31 vs 实验 0.22（粗网格偏冻结侧，机理明确） | VALIDATION_REPORT §3 |
-| M++ 升级适配（bb054e5→e8edf4f） | 重编适配层 + 数据恢复后 10 步冒烟通过（2026-09-12） | 本报告 §7；原升级报告 |
-| FireII 冻结相 / 双锥 Run42 冒烟 | 物理有效 / 越过全部历史崩溃点；生产运行待超算 | VALIDATION_REPORT §5/§8.1 |
+| M++ 升级适配（bb054e5→e8edf4f） | 重编适配层 + 数据恢复后 10 步冒烟通过（2026-09-12） | 本报告 §7（吸收自原升级报告） |
+| FireII 冻结相 / 双锥 Run42 冒烟 | 物理有效 / 越过全部历史崩溃点；生产运行待超算 | VALIDATION_REPORT §5/§0.3/§8.1 |
 
-**对 §5 差集的实践印证**：FireII 化学相三次发散的诊断（11 组元化学刚性 + 数值雅可比）与 §5.2（未接 `jacobianRho`）相互印证，是差集分析中"最值得优先补齐项"排序的依据。
+**对 §5 差集的实践印证**：FireII 化学相四次运行发散的诊断（11 组元化学刚性 + 数值雅可比）与 §5.2（未接 `jacobianRho`）相互印证，是差集分析中"最值得优先补齐项"排序的依据。
 
 ---
 
@@ -395,4 +395,4 @@ bash -ic 'make install'
 | `tacot-air_35`（TACOT 烧蚀碳-空气） | 上游 | ❌ 需 GSI 模块（§5.1），当前不可用 |
 | `n2_2` + `n2_2_Park` 机理 | **本地自定义**（不在 git 内） | ✅ Hornung V3 / 双锥 Run42（§7.3 维护注意） |
 
-历史失效名（旧算例→现库）：`N2_neut`/`N2_TTv`→`n2_2`、`air11nasa9`→`air_11`、`titan19`（Huygens 辐射算例）→现库无（需自定义）。原版 M++ 算例（Hornung NS CNEQ/TCNEQ/MeFiAlgo/Debug、IXV LTE M++）混合物名全部失效且缺 `libShapeFunctions`，运行前需两处适配（`high_enthalpy_testcases_report.md` §4 修正块）。
+历史失效名（旧算例→现库）：`N2_neut`/`N2_TTv`→`n2_2`、`air11`/`air11nasa9`→`air_11`、`titan19`（Huygens 辐射算例）→现库无（需自定义）。原版 M++ 算例（Hornung NS CNEQ/TCNEQ/MeFiAlgo/Debug、IXV LTE M++）混合物名全部失效且缺 `libShapeFunctions`，运行前需两处适配（`high_enthalpy_testcases_report.md` §4 修正块）。
