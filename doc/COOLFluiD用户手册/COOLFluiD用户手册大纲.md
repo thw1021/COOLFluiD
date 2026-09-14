@@ -156,7 +156,7 @@
   - 两温度模型：`NavierStokesTCNEQVarSet`（plugins/NEQ 模板类，`nbVibEnergyEqs`、化学源项 + VT 弛豫源项 `getSourceTermVT`）
   - 电子能量非平衡：`includeElectronicEnergy`、`getSourceEE`
   - 化学反应动力学：Arrhenius 速率、`getMassProductionTerm`、解析 Jacobian（`flagJac`）
-  - 物理化学库接口：`PhysicalChemicalLibrary` 抽象（src/Framework）与四个实现——`MutationLibrary`（MutationI/Mutation 1）、`MutationLibrary2`（Mutation2.0I，含 `data/` 六类子目录 chemistry/mixture/thermo/thermoCR/transfer/transport，共 191 个物性文件：138 数据表 + 26 种混合气 `.mix` + 27 种平衡组分 `.ceq`）、`MutationLibrary2OLD`（Mutation2.0.0I，数据文件在插件根目录）、`MutationLibrarypp`/`MutationLibraryppDebug`（MutationppI，需 `CF_ENABLE_MUTATIONPP`）
+  - 物理化学库接口：`PhysicalChemicalLibrary` 抽象（src/Framework）与四个实现——`MutationLibrary`（MutationI/Mutation 1）、`MutationLibrary2`（Mutation2.0I，含 `data/` 六类子目录 chemistry/mixture/thermo/thermoCR/transfer/transport，共 191 个物性文件：138 数据表 + 26 种混合气 `.mix` + 27 种平衡组分 `.ceq`）、`MutationLibrary2OLD`（Mutation2.0.0I，数据文件在插件根目录）、`MutationLibrarypp`/`MutationLibraryppDebug`（MutationppI，需 `CF_ENABLE_MUTATIONPP`）。**M++ 路径的 CFcase 选项、API 级映射与能力分工详证见 `doc/MUTATIONPP_INTEGRATION_REPORT.md`**
 - 3.1.6 LTE 局部热力学平衡：`LTE` 插件（组分平衡、输运与热物性，`Euler2DPuvtLTE` 等），与 NEQ 的切换条件
 - 3.1.7 等离子体模型：`ICP`（电感耦合等离子体、电磁场+流动，`ICPInductionConvVarSet` 等）、`ArcJet`（弧加热风洞，`ArcJetInductionConvVarSet` 等）、`ATDModel`（电弧热等离子体物性库）、`FiniteVolumeICP/FiniteVolumeArcJet` 求解器（`RMSJouleHeatSource`、`ICPInductionEquationSourceTerm` 等电磁源项）
 - 3.1.8 辐射模型：`RadiativeTransfer` 插件（切平板/射线追踪、谱带模型：HSNB（`testcases/HuygensDLR/hsnb.con` 等）、PARADE、Grey、ArcJet 谱库），与 NEQ 流场耦合策略（`omegRad`/`omegaRad` 源项交换）
@@ -315,7 +315,7 @@
 - 5.8.9 `SpectralFD/`、`SpectralFV/`：点分布布局、通量点重构、粘性处理（BR2/LocalApproach）
 - 5.8.10 `RadiativeTransfer/`：谱带模型（HSNB/PARADE/Grey）、射线求交、与流场耦合命令
 - 5.8.11 `ICP/`、`ArcJet/`：电磁源项（`ICPInductionEquationSourceTerm`、`RMSJouleHeatSource` 等）、感应加热、LTE 等离子体物性
-- 5.8.12 `MutationI/2.0I/2.0.0I/MutationppI/MutationUsage/`：库封装模式（`MutationLibrary` 族）与数据文件组织（`data/` 六类子目录）
+- 5.8.12 `MutationI/2.0I/2.0.0I/MutationppI/MutationUsage/`：库封装模式（`MutationLibrary` 族）与数据文件组织（`data/` 六类子目录）；MutationppI 的方法→M++ API 映射与依赖面（全树唯一消费者）见 `doc/MUTATIONPP_INTEGRATION_REPORT.md`
 - 5.8.13 `Petsc/`、`Pardiso/`、`SAMGLSS/`、`Trilinos/`、`Paralution/`：LSS 封装模式（含各 `Find*.cmake` 依赖查找）
 - 5.8.14 IO 插件：`CFmeshFileReader/Writer`、`CGNS2CFmesh/CGNSWriter`、`TecplotWriter`、`TecplotWriterNavierStokes`、`ParaViewWriter`、`ConvertStructMesh`、`Gmsh2CFmesh`、`Gambit2CFmesh`、`FAST2CFmesh`、`Dpl2CFmesh`、`Tecplot2CFmesh`、`XCFcaseConverter`（命令行工具，`main.cxx`）、`TecplotMerge`（含 `CoefMerge.cxx` 气动力系数合并）；注：`CFmesh2THOR` 与 `THOR2CFmesh` 为旧式/独立工具——`CFmesh2THOR` 无 `CMakeLists.txt`（未纳入构建系统），`THOR2CFmesh` 正常构建
 - 5.8.15 其余插件全索引表（每个插件一行：名称/类别/一句话功能/关键文件数）

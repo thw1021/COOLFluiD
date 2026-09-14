@@ -1,15 +1,16 @@
 # COOLFluiD 高焓流动验证报告
 
-日期：2026-09-07（2026-09-08 第二次复核；2026-09-08 第三次修订：系统性修复；2026-09-08 第四次修订：V5c/run2 完成与诊断；**2026-09-12 第五次修订：完成度系统核查与超算运行说明**）｜ 版本：复核修订版 ｜ 状态：Hornung V3 定量验证完成；FireII 化学相/双锥 Run42/细网格待超算（§0 与 §8）
+日期：2026-09-07（2026-09-08 第二次复核；2026-09-08 第三次修订：系统性修复；2026-09-08 第四次修订：V5c/run2 完成与诊断；2026-09-12 第五次修订：完成度系统核查与超算运行说明；**2026-09-13 第六次修订：文档整合**）｜ 版本：复核修订版 ｜ 状态：Hornung V3 定量验证完成；FireII 化学相/双锥 Run42/细网格待超算（§0 与 §8）
 
 ## 版本时间线（倒序）
 
 | 日期 | 事件 |
 |------|------|
+| **2026-09-13** | **第六次修订（文档整合）**：删除阶段报告 `VALIDATION_MPP_INTERIM.md` 与升级报告 `MUTATIONPP_UPGRADE_ADAPTATION_REPORT.md`（耐久内容并入新报告 `MUTATIONPP_INTEGRATION_REPORT.md`——COOLFluiD × Mutation++ 能力分工、API 级映射与升级 SOP）；本文档全部指向已删报告的引用改为就地保留关键事实（§0.3/§9 双锥冒烟证据）或指向新报告（§8.0 重编 SOP） |
 | **2026-09-12** | **第五次修订**：完成度系统核查（结果目录/日志/CFcase/脚本逐一核实），新增 §0 完成度总览与 §8 超算运行说明；同日复核修正——发现原版 M++ 算例混合物名失效问题（§8.3/§8.4）、FireII inter 文件二阶开关依赖（§8.2）、趋势日志实际路径、jesus0/14641 网格脉络澄清（§3.2） |
 | 2026-09-08 | **第二次复核**：修正冻结/平衡脱体距离排序错误，改用 Mutation++ `mppshock` 正激波解作定量参考 → **第三次修订**：系统性修复 4 项（Hornung V5 网格缩放 bug、ShockTube 1D `setState` 缺失、FireII 两阶段策略、MutationppI 适配层数值鲁棒化）→ **第四次修订**：V5b/V5c 细网格复跑与诊断（V5b CFL=10 失稳、V5c 50000 步完成但物理无效）、FireII 化学相 run1/run2 发散诊断 |
 | 2026-09-07 | **报告初版**：Hornung V3 定量验证（38054 步收敛、4 准则激波定位复核）、SU2 NEMO 交叉对比（定性）、FireII 冻结相物理有效性确认 |
-| 2026-09-05 ~ 09-06 | Mutation++ 接入与 7 项库级核查；求解器启动三问题修复（libShapeFunctions / `--ldir` 模块目录 / ParMETIS 混 MPI）；Hornung V3 收敛；FireII/双锥冒烟通过；CUDA 垫片 + systemd 用户单元可靠启动配方（阶段记录：`doc/VALIDATION_MPP_INTERIM.md`） |
+| 2026-09-05 ~ 09-06 | Mutation++ 接入与 7 项库级核查；求解器启动三问题修复（libShapeFunctions / `--ldir` 模块目录 / ParMETIS 混 MPI）；Hornung V3 收敛；FireII/双锥冒烟通过；CUDA 垫片 + systemd 用户单元可靠启动配方（阶段记录已并入本报告时间线与 §7/§8） |
 | 2026-08-26 / 08-28 | 前置静态评估：求解能力综合评估（`COOLFluiD_高焓高超声速求解能力评估报告.md`）与 43 个算例逐一静态评估（`high_enthalpy_testcases_report.md`） |
 
 > **第五次修订（2026-09-12，完成度系统核查）主要更新**
@@ -32,8 +33,8 @@
 >    适配（§8.3/§8.4 及 high_enthalpy_testcases_report §4 修正）；② FireII
 >    `fire2.inter` 承载二阶开关（gradientFactor=1.0），不可整体注释（§8.2）；
 >    ③ FireII 化学相趋势日志实际位于 `plugins/NEQ/testcases/TCNEQ/FireII/logs/`
->    （§5.2 路径已改）；④ 双锥冒烟结果目录已清理为空，冒烟证据以
->    VALIDATION_MPP_INTERIM.md 记录为准。
+>    （§5.2 路径已改）；④ 双锥冒烟结果目录已清理为空，冒烟证据以本报告
+>    §0.3 与时间线记录为准（原阶段报告已并入文档整合）。
 
 > **第三次修订（系统性修复工作）主要更新**
 > 1. **修复 Hornung V5 细网格算例的网格尺度错误**：V5 CFcase 对已是米制的
@@ -98,7 +99,7 @@
 
 | 算例 | 优先级 | 状态与说明 | 资源预估 |
 |------|-------|-----------|---------|
-| **DoubleCone Run42**（N₂ TCNEQ） | **最高（论文主锚点）** | Lani 2009 图 6.18/6.19、Lani 2013 图 13/Table 1（CUBRC LENS I 实验壁面压力/热流）；M++ 适配完成，冒烟通过（2026-09-06，记录见 `doc/VALIDATION_MPP_INTERIM.md`；冒烟结果目录已清理）；CFcase 当前为冒烟配置（nbSteps=100），生产前需按 §8.1 修改 | ≥16 核（脚本按 32 核备），1–2 天 |
+| **DoubleCone Run42**（N₂ TCNEQ） | **最高（论文主锚点）** | Lani 2009 图 6.18/6.19、Lani 2013 图 13/Table 1（CUBRC LENS I 实验壁面压力/热流）；M++ 适配完成，冒烟通过（2026-09-06：越过全部历史崩溃点、物种残差下降、KSP GMRES 正常收敛；冒烟结果目录已清理）；CFcase 当前为冒烟配置（nbSteps=100），生产前需按 §8.1 修改 | ≥16 核（脚本按 32 核备），1–2 天 |
 | **FireII 化学相生产运行** | 高 | 本地三次发散后的超算重试；需按 §8.2 调整策略（交互式 CFL 替换为 Function 调度、停止条件、重启路径） | ≥32 核，1 天内 |
 | Hornung 细网格 δ/R 网格收敛（V6 方案） | 中 | V5 三次失败后的替代方案：改 NavierStokes2DNEQ 黏性壁面或 Euler+更低 CFL，检验 V3 的 δ/R 高估 39% 是否随网格加密收敛至实验 0.22（§8.3） | 12–32 核，小时级/轮次 |
 | （可选）Hornung TCNEQ M++（NS 双温度） | 低 | 未运行；2026-09-12 核查发现原版 CFcase **需先适配**（mixtureName `N2_TTv` 已失效→`n2_2`、Modules.Libs 首位补 `libShapeFunctions`，改法参照 `hornung_FVM_NS_CNEQ_EULER_n2_2.CFcase`）；为 ChemNonEqTTv 变量集提供与 V3 同类的驻点线验证，可作双锥 TCNEQ 的旁证 | 2–8 核，小时级 |
@@ -636,9 +637,12 @@ bash run_coolfluid.sh <case_file> 12 28800
    网格/CFcase 与 `doc/validation/` 脚本）同步至超算，按本机相同的 CMake 配置
    重新编译（依赖：MPICH、PETSc、Boost 1.85、MPICH 版 ParMETIS 4.0.3、
    Mutation++）。
-2. **Mutation++ 版本锁定**：必须使用与本机验证一致的版本
-   （v1.0.5-92-gbb054e5）。M++ 重新安装/升级后 **适配层 libMutationppI 必须重编**
-   （本机已验证 ABI 兼容随 M++ 库重建而失效）。
+2. **Mutation++ 版本**：Hornung V3 定量验证基于 v1.0.5-92-gbb054e5；本机已于
+   2026-09-12 升级至 **v1.0.5-108-ge8edf4f** 并冒烟通过（见
+   `doc/MUTATIONPP_INTEGRATION_REPORT.md` §8）。超算环境请与 v1.0.5-108-ge8edf4f
+   统一。M++ 重新安装/升级后 **适配层 libMutationppI 必须重编**
+   （重编 5 步 SOP 见 `doc/MUTATIONPP_INTEGRATION_REPORT.md` §7.2；升级影响
+   核查方法与自定义数据文件 `n2_2.xml`/`n2_2_Park.xml` 检查同见 §7）。
 3. **ParMETIS 与 MPI 一致**：ParMETIS 必须与所用 MPI 匹配（本机曾因系统
    OpenMPI 版 ParMETIS 混链 MPICH 程序而 PMPI_Allreduce abort）。用超算默认
    MPI 时需重编 ParMETIS 或改用超算自带的匹配版本。
@@ -843,7 +847,7 @@ CFL=10 失稳 → V5c CFL≤1.0 完成 50000 步但解物理无效（激波后 �
 | FireII 冻结相 | 部分完成 | [OK] 物理有效 | iter_1000：密度激波后增加 12%，速度递减至壁面，T 峰 40545 K；9 个过冲单元（0.21%）；冻结相在 CFL=0.5 步 1159 发散 | `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_FROZEN/` |
 | FireII 化学相 run2 | 部分完成 | [FAIL] 发散→待超算重试 | CFL=0.01 恒定，残差从 2.46 单调上升至 5.21（步 3339）→ NaN（步 3340）；11 组元化学刚性根本限制；**重试策略 A/B/C 见 §8.2** | `plugins/NEQ/testcases/TCNEQ/FireII/results/RESULT_FIREII_MPP_RUN2/` |
 | ShockTube 1D | 部分完成 | [WARN] RHS≡0 已修复，T 分量待通 | 修复 setState 后 6/7 残差收敛至 −6，T 停滞 ~3.1；瞬态激波对比未通过 | `plugins/NEQ/testcases/TCNEQ/ShockTube/` |
-| DoubleCone Run42 | 待运行 | [WAIT] 待超算 | M++ 适配完成、冒烟通过（2026-09-06，记录见 `doc/VALIDATION_MPP_INTERIM.md`；结果目录已清理）；CFcase 为冒烟配置（nbSteps=100）；**生产配置修改清单见 §8.1**；需 ≥16 核，1-2 天 | `plugins/NEQ/testcases/TCNEQ/DoubleCone/Run42_N2/` |
+| DoubleCone Run42 | 待运行 | [WAIT] 待超算 | M++ 适配完成、冒烟通过（2026-09-06：越过全部历史崩溃点、KSP 正常；结果目录已清理）；CFcase 为冒烟配置（nbSteps=100）；**生产配置修改清单见 §8.1**；需 ≥16 核，1-2 天 | `plugins/NEQ/testcases/TCNEQ/DoubleCone/Run42_N2/` |
 | Hornung V5（细网格）| 部分完成 | [FAIL] V5c 解物理无效→V6 方案待运行 | V3 收敛（δ/R=0.31）；V5 缩放 bug 作废；V5b CFL=10 失稳作废；V5c 50000 步完成但 rho→0/p→0 解物理无效（Euler 细网格驻点奇异性）；**以 V3 为准；替代方案见 §8.3** | `plugins/NEQ/testcases/TCNEQ/Hornung/results/RESULTS_CNEQ_EULER_N22_V3/` `.../RESULTS_CNEQ_EULER_N22_V5C/` |
 | Hornung TCNEQ M++（可选）| 待运行 | [WAIT] 未运行 | 需先适配（mixtureName 失效、缺 libShapeFunctions，§8.4）；为 ChemNonEqTTv 提供独立验证 | `plugins/NEQ/testcases/TCNEQ/Hornung/hornung_FVM_NS_TCNEQ_M++.CFcase` |
 | HEG 空气圆柱（可选）| 待运行 | [WAIT] 未适配 | 论文直接锚定算例；需 air_5 + HEG 来流适配（§8.4） | — |

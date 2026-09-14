@@ -9,6 +9,7 @@
 
 | 日期 | 事件 |
 |------|------|
+| **2026-09-13** | **更新**：新增与 `MUTATIONPP_INTEGRATION_REPORT.md`（COOLFluiD × Mutation++ 能力分工/API 映射/升级 SOP）的交叉引用——本报告 §1.2 的物性库接口插件与 §2.1 的化学库接入细节，在该报告中给出 API 级映射与"COOLFluiD 自实现 vs M++ 提供"的完整差集分析 |
 | **2026-09-12** | **更新**：新增 §6.1 实测验证进展（完成度四档结论）；修正 §7.2 环境结论（miniforge3/conda 已安装，初版"conda 缺失"不再成立）；同步更新问题清单、修改建议、主要局限与综合结论 |
 | 2026-08-26 | **初版**：静态代码审查 + 构建/启动验证（C++ 约 36.5 万行、863 个插件文件、1236 个 `.CFcase`；能力定级"强"） |
 | 2026-09-05 ~ 09-12 | （非本报告范围）实际运行验证分阶段开展并形成独立报告，时间线详见 `doc/VALIDATION_REPORT.md`；算例清单级状态见 `doc/high_enthalpy_testcases_report.md` §6 |
@@ -34,7 +35,7 @@ COOLFluiD 采用**多插件（plugin）架构**，内核（`src/`）与物理/�
 | `FiniteVolumeNavierStokes` | 高焓流 Navier-Stokes 有限体积求解与壁面热流后处理 |
 | `RadiativeTransfer` | 辐射传输求解器与辐射物性库（HSNB/PARADE/Grey/ArcJet） |
 | `Catalycity` | 壁面催化模型 |
-| `Mutation2.0I` / `Mutation2OLDI` / `MutationppI` | 物理化学库接口（热物性、输运、化学反应速率） |
+| `Mutation2.0I` / `Mutation2OLDI` / `MutationppI` | 物理化学库接口（热物性、输运、化学反应速率）；**M++ 集成的完整 API 级映射、能力分工与未用功能差集见 `MUTATIONPP_INTEGRATION_REPORT.md`** |
 | `LTE` | 局部热力学平衡模型 |
 | `ATDModel` | 空气热解模型 |
 | `ArcJet` | 感应耦合等离子体（ICP）/弧加热器（LTE + 感应） |
@@ -105,7 +106,7 @@ COOLFluiD 在高焓非平衡建模上提供了**完整、工业级**的能力：
 - **主导方法**：二阶格心有限体积（`CellCenterFVM`），支持重构 `LinearLS2D/3D`、限制器 `Venktn2D/3D`（Venkatakrishnan）、`Bartels`、`SuperBee` 等。
 - **Riemann 求解器 / 通量分裂器**（高焓多组分专用）：
   - `AUSMPlusMS2D/3D`（AUSM+ 多组分）、`AUSMPlusUp`、`AUSM`、`PlusMS`
-  - `Roe`、`HLLC`、`VanLeer`、`LDA`、`LDFSS` 等
+  - `Roe`、`VanLeer` 等（FVM 分裂器）；HLL/LDA 型格式在 RDS/FluctSplit（如 `SysBLDAHLLCx`，双锥 CRD 所用）。初版所列 `LDFSS` 经全树 grep 证实不存在，已删（2026-09-13 复核）
 - **高阶方法**（`plugins/` 下完整支持）：
   - `FluxReconstructionMethod`（FR，含 PETSc 与 CUDA 版本）
   - `SpectralFD`、`SpectralFV`
